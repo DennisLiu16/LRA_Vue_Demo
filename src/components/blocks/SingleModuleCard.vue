@@ -29,7 +29,7 @@
             />
           </p>
           <p v-else>
-            {{ localModuleInfo.name }}
+            {{ moduleStore.getModuleInfo(props.mid).name }}
           </p>
         </n-space>
 
@@ -45,7 +45,7 @@
             />
           </p>
           <p v-else>
-            {{ localModuleInfo.ip }}
+            {{ moduleStore.getModuleInfo(props.mid).ip }}
           </p>
         </n-space>
 
@@ -62,7 +62,7 @@
             />
           </p>
           <p v-else>
-            {{ localModuleInfo.port }}
+            {{ moduleStore.getModuleInfo(props.mid).port }}
           </p>
         </n-space>
 
@@ -78,7 +78,7 @@
             />
           </p>
           <p v-else>
-            {{ localModuleInfo.server }}
+            {{ moduleStore.getModuleInfo(props.mid).server }}
           </p>
         </n-space>
       </n-space>
@@ -151,7 +151,7 @@ import { useModuleStore } from "@/stores/useModuleStore";
 const props = defineProps({
   mid: {
     // module id
-    type: Number,
+    type: String,
     required: true,
   },
 });

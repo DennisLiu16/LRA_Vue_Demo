@@ -8,28 +8,27 @@ export const useModuleStore = defineStore(
   "useModuleStore",
   () => {
     const moduleList = reactive<{ modules: Module[] }>({ modules: [] });
-    let moduleMid = 0;
 
     const addModule = (obj: Module) => {
       moduleList.modules.push(obj);
     };
 
     // mid: module id
-    const removeModule = (mid: number) => {
+    const removeModule = (mid: string) => {
       const idx = getModuleIndex(mid);
       if (idx !== undefined) {
         moduleList.modules.splice(idx, 1);
       }
     };
 
-    const getModuleIndex = (mid: number) => {
+    const getModuleIndex = (mid: string) => {
       const fitMid = (el: Module) => el.mid === mid;
 
       // TODO: protect
       return moduleList.modules.findIndex(fitMid);
     };
 
-    const getModuleInfo = (mid: number) => {
+    const getModuleInfo = (mid: string) => {
       const idx = getModuleIndex(mid);
       const info = {} as IModuleInfo;
       if (idx !== undefined) {
@@ -41,7 +40,7 @@ export const useModuleStore = defineStore(
       return info;
     };
 
-    const updateModule = (mid: number, obj: IModuleInfo) => {
+    const updateModule = (mid: string, obj: IModuleInfo) => {
       const idx = getModuleIndex(mid);
       if (idx !== undefined) {
         moduleList.modules[idx].ip = obj.ip;
@@ -53,7 +52,6 @@ export const useModuleStore = defineStore(
 
     return {
       moduleList,
-      moduleMid,
       addModule,
       removeModule,
       updateModule,
