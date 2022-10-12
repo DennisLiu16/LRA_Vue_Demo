@@ -1,18 +1,21 @@
+import { useModuleStore } from "@/stores/useModuleStore";
+
 export interface IModuleInfo {
-  name: String, 
-  ip: String, 
-  port: Number, 
-  server:String
-};
+  name: string;
+  ip: string;
+  port: number;
+  server: string;
+}
 
 export class Module {
+  // static _mid = useModuleStore().moduleMid;
   static _mid = 0;
 
-  name: String;
-  ip: String;
-  port: Number;
-  server: String;
-  mid: Number;
+  name: string;
+  ip: string;
+  port: number;
+  server: string;
+  mid: number;
 
   connectState: "ON" | "OFF" | "UNKNOWN"; // connection led state
   enable: "ON" | "OFF"; // enable button state
@@ -28,4 +31,4 @@ export class Module {
     this.enable = "OFF";
     this.onProgram = [];
   }
-};
+}
