@@ -1,9 +1,20 @@
 <template>
   <n-card>
     <div>
-      <n-button strong secondary circle type="error" style="float: right">
-        <Icon :size="20"> <DeleteForeverRound /> </Icon
-      ></n-button>
+      <div>
+        <n-button
+          class="btn-region"
+          strong
+          secondary
+          circle
+          type="error"
+          @click="serverStore.removeServer(props.uuid)"
+        >
+          <Icon :size="20"> <DeleteForeverRound /> </Icon
+        ></n-button>
+      </div>
+      <div class="btn-region"><ServerModifyForm :uuid="props.uuid" /></div>
+      <!-- TODO: Move to ServerModifyForm and verify console log in useServerStore -->
     </div>
 
     <n-space vertical>
@@ -42,6 +53,8 @@ import { NButton, NCard, NSpace } from "naive-ui";
 import { useServerStore } from "@/stores/useServerStore";
 import { Icon } from "@vicons/utils";
 import { DeleteForeverRound } from "@vicons/material";
+import { AppsList20Filled } from "@vicons/fluent";
+import ServerModifyForm from "@/components/form/ServerModifyForm.vue";
 
 const props = defineProps({
   uuid: {
@@ -61,4 +74,9 @@ const tryToGetResponsiveServerInfo = computed(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.btn-region {
+  float: right;
+  margin-right: 2px;
+}
+</style>

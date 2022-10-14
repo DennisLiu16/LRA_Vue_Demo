@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.56",
+    "@vicons/fluent": "^0.12.0",
     "@vicons/material": "^0.12.0",
     "@vicons/utils": "^0.1.4",
     "@vitejs/plugin-vue": "^3.0.3",

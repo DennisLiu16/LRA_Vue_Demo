@@ -75,6 +75,12 @@ export const useServerStore = defineStore(
       return info;
     }
 
+    const removeServer = (uuid: string) => {
+      // if not found, throw internal error
+      const idx = getServerIndex(uuid);
+      serverList.servers.splice(idx, 1);
+    }
+
     return {
       serverList,
       serverSelect,
@@ -82,6 +88,7 @@ export const useServerStore = defineStore(
       getServerIndex,
       getServerInfo,
       getServerName,
+      removeServer,
     };
   },
   {
