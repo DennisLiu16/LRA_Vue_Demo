@@ -22,7 +22,6 @@
           <p v-if="btnModifyState">
             <n-input
               v-model:value="localModuleInfo.name"
-              :style="{ width: '50%' }"
               type="text"
               name=""
               id="name"
@@ -38,7 +37,6 @@
           <p v-if="btnModifyState">
             <n-input
               v-model:value="localModuleInfo.ip"
-              :style="{ width: '50%' }"
               type="text"
               name=""
               id="ip"
@@ -52,11 +50,8 @@
         <n-space horizontal>
           <label for="port">Port: </label>
           <p v-if="btnModifyState">
-            <n-input
+            <n-input-number
               v-model:value="localModuleInfo.port"
-              :style="{ width: '50%' }"
-              :allow-input="onlyAllowNumber"
-              type="text"
               name=""
               id="port"
             />
@@ -69,16 +64,21 @@
         <n-space horizontal>
           <label for="server">Server: </label>
           <p v-if="btnModifyState">
-            <n-input
+            <n-select
+              :consistent-menu-width="false"
               v-model:value="localModuleInfo.server"
-              :style="{ width: '50%' }"
-              type="text"
-              name=""
+              :options="serverStore.serverSelect"
               id="server"
             />
           </p>
+          <!-- 新增伺服器的表單 -->
+          <ServerForm v-if="btnModifyState" @formSubmit="addNewServerCallBack" />
           <p v-else>
-            {{ moduleStore.getModuleInfo(props.mid).server }}
+            {{
+              serverStore.getServerName(
+                moduleStore.getModuleInfo(props.mid).server
+              )
+            }}
           </p>
         </n-space>
       </n-space>
@@ -112,16 +112,19 @@
           確認
         </n-button>
 
+        <!-- TODO: add button loading state -->
         <n-button
+          v-if="!btnEnableState"
           strong
           secondary
           round
           type="info"
+          :disabled="!enableCheck()"   
           @click="enableCallBack"
-          v-if="!btnEnableState"
         >
           傳輸
         </n-button>
+
         <n-button
           strong
           round
@@ -133,13 +136,20 @@
         </n-button>
       </p>
     </n-card>
-    <br>
+    <br />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import { NButton, NInput, NCard, NSpace } from "naive-ui";
+import { ref, reactive, computed } from "vue";
+import {
+  NButton,
+  NInput,
+  NCard,
+  NSpace,
+  NSelect,
+  NInputNumber,
+} from "naive-ui";
 import { Icon } from "@vicons/utils";
 import { DeleteForeverRound } from "@vicons/material";
 
@@ -147,6 +157,10 @@ import type { IModuleInfo, Module } from "@/interface/module.interface";
 import type { Ref } from "vue";
 
 import { useModuleStore } from "@/stores/useModuleStore";
+import { useServerStore } from "@/stores/useServerStore";
+
+import ServerForm from "@/components/form/ServerForm.vue";
+import type { IServerInfo } from "@/interface/server.interface";
 
 const props = defineProps({
   mid: {
@@ -157,12 +171,20 @@ const props = defineProps({
 });
 
 const moduleStore = useModuleStore();
+const serverStore = useServerStore();
 
 const localModuleInfo = reactive<IModuleInfo>(
   moduleStore.getModuleInfo(props.mid)
 );
+
+// ref to localInfo, bug: won't update when serverinfo update by user
+// const serverName = computed(() => {
+//   return serverStore.getServerName(localModuleInfo.server);
+// });
+
 const btnModifyState = ref(false);
 const btnEnableState = ref(false);
+const btnAddNewServer = ref(false);
 
 const onlyAllowNumber = (value: string) => !value || /^\d+$/.test(value);
 
@@ -192,6 +214,25 @@ const confirmCallBack = () => {
 const enableCallBack = () => {
   modifyBooleanState(btnEnableState);
   /* TODO: Do something else here according to new state */
+};
+
+const enableCheck = () => {
+  return (
+    serverStore.getServerName(moduleStore.getModuleInfo(props.mid).server) !==
+    serverStore.invalidName
+  );
+};
+
+const addNewServerCallBack = (serverinfo: IServerInfo) => {
+
+  // Add to serverList
+  serverStore.serverList.servers.push(serverinfo);
+  console.log(serverStore.serverList.servers);
+
+  // TODO: hit api to check alive, modify data in serverList, not local var
+  // if success -> modify localserver to target server
+  // if fail -> remove from list, ansyc function
+
 };
 </script>
 
