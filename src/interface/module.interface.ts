@@ -1,5 +1,3 @@
-import { useModuleStore } from "@/stores/useModuleStore";
-
 export interface IModuleInfo {
   mid: string,
   name: string;
