@@ -13,8 +13,9 @@
           <Icon :size="20"> <DeleteForeverRound /> </Icon
         ></n-button>
       </div>
-      <div class="btn-region"><ServerModifyForm :uuid="props.uuid" /></div>
-      <!-- TODO: Move to ServerModifyForm and verify console log in useServerStore -->
+      <div class="btn-region">
+        <ServerModifyForm :uuid="props.uuid" @form-modified="modifyServerCallBack" />
+      </div>
     </div>
 
     <n-space vertical>
@@ -56,6 +57,8 @@ import { DeleteForeverRound } from "@vicons/material";
 import { AppsList20Filled } from "@vicons/fluent";
 import ServerModifyForm from "@/components/form/ServerModifyForm.vue";
 
+import type { IServerInfo } from "@/interface/server.interface";
+
 const props = defineProps({
   uuid: {
     type: String,
@@ -72,6 +75,16 @@ const tryToGetResponsiveServerInfo = computed(() => {
   console.log("this should appear if server info being modified");
   return serverStore.serverList.servers[idx];
 });
+
+const modifyServerCallBack = (serverinfo: IServerInfo) => {
+  // Add to serverList
+  serverStore.updateServerInfo(props.uuid, serverinfo);
+  console.log(serverStore.serverList.servers);
+
+  // TODO: hit api to check alive, modify data in serverList, not local var
+  // if success -> modify localserver to target server
+  // if fail -> remove from list, ansyc function
+};
 </script>
 
 <style scoped>

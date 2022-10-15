@@ -42,7 +42,7 @@
         secondary
         round
         type="primary"
-        @click="ValidateCallBack"
+        @click="validateCallBack"
         style="float: right"
       >
         確認
@@ -52,7 +52,7 @@
         secondary
         round
         type="error"
-        @click="CancelCallBack"
+        @click="cancelCallBack"
         style="float: right"
       >
         取消
@@ -98,28 +98,40 @@ function createNewTmpServer() {
   return server;
 }
 
+// Need to send back type IServerInfo, not typeof(Ref<IServerInfo>.value)
+// Leading uuid error
+const emitSubmit = () => {
+  const info: IServerInfo = {
+    uuid: localServerInfo.value.uuid,
+    name: localServerInfo.value.name,
+    ip: localServerInfo.value.ip,
+    port: localServerInfo.value.port,
+    alive: localServerInfo.value.alive
+  };
+
+  emit("formSubmit", info);
+  showModal.value = false;
+  // create new uuid for next new server
+  localServerInfo.value.uuid = uuidv4();
+};
+
 // TODO: Add validate condition, ref to form naive-ui
-const ValidateCallBack = () => {
-  console.log(formRef.value?.validate);
+const validateCallBack = () => {
   if (formRef.value?.validate === undefined) {
     // no validate rule
-    emit("formSubmit", localServerInfo.value);
-    showModal.value = false;
+    emitSubmit();
   } else {
     formRef.value?.validate((errors) => {
       if (!errors) {
         // send local info back to father
-        console.log("good");
-        emit("formSubmit", localServerInfo.value);
-        showModal.value = false;
+        emitSubmit();
       } else {
-        console.log("failed");
       }
     });
   }
 };
 
-const CancelCallBack = () => {
+const cancelCallBack = () => {
   showModal.value = false;
 };
 

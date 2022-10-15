@@ -41,7 +41,7 @@ export const useServerStore = defineStore(
           name: "MainServer",
           ip: window.location.hostname,
           port: parseInt(window.location.port),
-          alive: false
+          alive: false,
         } as IServerInfo;
         serverList.servers.push(localServer);
       } else {
@@ -73,13 +73,29 @@ export const useServerStore = defineStore(
       info.port = serverList.servers[idx].port;
       info.alive = serverList.servers[idx].alive;
       return info;
-    }
+    };
 
     const removeServer = (uuid: string) => {
       // if not found, throw internal error
       const idx = getServerIndex(uuid);
       serverList.servers.splice(idx, 1);
-    }
+    };
+
+    const updateServerInfo = (uuid: string, info: IServerInfo) => {
+      const idx = getServerIndex(uuid);
+      if (info.name !== serverList.servers[idx].name)
+        serverList.servers[idx].name = info.name;
+
+      if (info.ip !== serverList.servers[idx].ip) {
+        serverList.servers[idx].ip = info.ip;
+        serverList.servers[idx].alive = false;
+      }
+
+      if (info.port !== serverList.servers[idx].port) {
+        serverList.servers[idx].port = info.port;
+        serverList.servers[idx].alive = false;
+      }
+    };
 
     return {
       serverList,
@@ -89,6 +105,7 @@ export const useServerStore = defineStore(
       getServerInfo,
       getServerName,
       removeServer,
+      updateServerInfo,
     };
   },
   {

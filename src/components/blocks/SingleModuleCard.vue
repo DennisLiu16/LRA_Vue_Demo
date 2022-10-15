@@ -72,7 +72,10 @@
             />
           </p>
           <!-- 新增伺服器的表單 -->
-          <ServerForm v-if="btnModifyState" @formSubmit="addNewServerCallBack" />
+          <ServerForm
+            v-if="btnModifyState"
+            @form-submit="addNewServerCallBack"
+          />
           <p v-else>
             {{
               serverStore.getServerName(
@@ -119,7 +122,7 @@
           secondary
           round
           type="info"
-          :disabled="!enableCheck()"   
+          :disabled="!enableCheck()"
           @click="enableCallBack"
         >
           傳輸
@@ -224,15 +227,14 @@ const enableCheck = () => {
 };
 
 const addNewServerCallBack = (serverinfo: IServerInfo) => {
-
   // Add to serverList
+  console.log(serverinfo);
   serverStore.serverList.servers.push(serverinfo);
   console.log(serverStore.serverList.servers);
 
   // TODO: hit api to check alive, modify data in serverList, not local var
   // if success -> modify localserver to target server
   // if fail -> remove from list, ansyc function
-
 };
 </script>
 

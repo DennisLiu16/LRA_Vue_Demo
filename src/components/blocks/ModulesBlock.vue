@@ -32,11 +32,10 @@ function debugOnly() {
 }
 
 const addModule = () => {
-  const tmpUUID:string = uuidv4();
 
   // create a module instance
   const module = new Module({
-    mid: tmpUUID,
+    mid: uuidv4(),
     name: "Default",
     ip: "192.0.0.0",
     port: 8787,

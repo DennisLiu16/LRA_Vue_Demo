@@ -85,18 +85,32 @@ const props = defineProps({
     required: true,
   },
 });
-const emits = defineEmits(["modified"]);
+const emits = defineEmits(["formModified"]);
 
 const formRef = ref<FormInst | null>(null);
 
 const showModal = ref(false);
 const serverStore = useServerStore();
 
-const localServerInfo = reactive(
-  serverStore.getServerInfo(props.uuid)
-);
+const localServerInfo = ref(serverStore.getServerInfo(props.uuid));
 
-const ValidateCallBack = () => {};
+const ValidateCallBack = () => {
+  if (formRef.value?.validate === undefined) {
+    // no validate rule
+    emits("formModified", localServerInfo.value);
+    showModal.value = false;
+  } else {
+    formRef.value?.validate((errors) => {
+      if (!errors) {
+        // send local info back to father
+        emits("formModified", localServerInfo.value);
+        showModal.value = false;
+      } else {
+        console.log("failed");
+      }
+    });
+  }
+};
 
 const CancelCallBack = () => {
   showModal.value = false;
