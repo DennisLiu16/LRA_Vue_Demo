@@ -1,6 +1,6 @@
-<template lang="">
+<template>
   <div>
-    <n-card>
+    <n-card class="card">
       <n-button
         strong
         secondary
@@ -249,6 +249,10 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
 </script>
 
 <style scoped>
+.card {
+  max-height: 300px;
+  max-width: 700px;
+}
 .btn-region {
   float: right;
   margin: 5px;

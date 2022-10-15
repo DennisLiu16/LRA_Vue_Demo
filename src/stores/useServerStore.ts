@@ -37,6 +37,7 @@ export const useServerStore = defineStore(
         serverList.servers.find((el) => el.name == "MainServer") == undefined
       ) {
         const uuid = uuidv4();
+        /* TODO: 要將 ip 和 port 改成之後 django 的設置 */
         const localServer = {
           uuid: uuid,
           name: "MainServer",

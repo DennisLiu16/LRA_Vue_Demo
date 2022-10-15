@@ -1,26 +1,22 @@
-<template lang="">
+<template>
+  <div class="add-button-on-top">
+    <n-button
+      secondary
+      class="btn-region"
+      circle
+      type="info"
+      @click="addModule"
+    >
+      <Icon :size="20"> <AddFilled /> </Icon
+    ></n-button>
+  </div>
+
   <div>
-    <p>
-      <n-button
-        secondary
-        class="btn-region"
-        circle
-        type="info"
-        @click="addModule"
-      >
-        <Icon :size="20"> <AddFilled /> </Icon
-      ></n-button>
-    </p>
-
-    <br />
-
-    <p>
-      <SingleModuleCard
-        v-for="(module, i) in moduleStore.moduleList.modules"
-        :key="module.mid"
-        :mid="module.mid"
-      />
-    </p>
+    <SingleModuleCard
+      v-for="(module, i) in moduleStore.moduleList.modules"
+      :key="module.mid"
+      :mid="module.mid"
+    />
   </div>
 </template>
 
@@ -63,6 +59,11 @@ const addModule = () => {
 </script>
 
 <style scoped>
+
+.add-button-on-top {
+  position: absoulte;
+  z-index: 1;
+}
 .btn-region {
   float: right;
   margin: 5px;

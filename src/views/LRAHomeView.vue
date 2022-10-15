@@ -2,14 +2,24 @@
 import ModulesBlock from "@/components/blocks/ModulesBlock.vue";
 import ServerBlock from "@/components/blocks/ServersBlock.vue";
 
-import { NSpace } from "naive-ui";
+import { NDivider } from "naive-ui";
 </script>
 
 <template>
   <main>
+
+    <n-divider dashed>
+      Servers
+    </n-divider>
+
     <div class="block-region">
       <ServerBlock />
     </div>
+
+    <n-divider dashed>
+      Modules
+    </n-divider>
+
     <div class="block-region">
       <ModulesBlock />
     </div>

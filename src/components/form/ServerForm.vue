@@ -15,7 +15,7 @@
     :mask-closable="false"
     :segmented="segmented"
     :bordered="false"
-    title="新增伺服器"
+    title="Add New Server"
     size="huge"
   >
     <template #header-extra></template>
@@ -100,7 +100,7 @@ function createNewTmpServer() {
   const server: IServerInfo = {
     uuid: uuidv4(),
     name: "DefaultServer",
-    ip: "192.0.0.1",
+    ip: "192.168.0.1",
     port: 8787,
     alive: false,
   };
@@ -215,4 +215,8 @@ const bodyStyle = { width: "600px" };
 const segmented = { content: "soft", footer: "soft" };
 </script>
 
-<style scoped></style>
+<style scoped>
+template {
+  font-family: Helvetica, sans-serif;
+}
+</style>
