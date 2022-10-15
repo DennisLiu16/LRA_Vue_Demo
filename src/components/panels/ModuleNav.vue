@@ -1,13 +1,35 @@
 <!-- Module 右滑的 Panel -->
 
-<template lang="">
-  <div>
-    
-  </div>
+<template>
+
+  
 </template>
+
 <script setup lang="ts">
+// lib
+import { ref, reactive, computed, type Ref } from "vue";
+import { NButton, NInput } from "naive-ui";
+import { Icon } from "@vicons/utils";
+import VueHorizontal from "vue-horizontal";
+
+// store
+// import { useServerStore } from "@/stores/useServerStore";
+
+// material
+// import { DeleteForeverRound } from "@vicons/material";
+
+// props and emit
+const props = defineProps({
+
+});
+
+const emits = defineEmits({
+
+});
+
 
 </script>
-<style lang="">
-  
+
+<style scoped>
+
 </style>
