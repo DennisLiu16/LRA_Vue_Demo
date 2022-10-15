@@ -215,4 +215,4 @@ const bodyStyle = { width: "600px" };
 const segmented = { content: "soft", footer: "soft" };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

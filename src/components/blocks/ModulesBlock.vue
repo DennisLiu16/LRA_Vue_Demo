@@ -1,10 +1,18 @@
 <template lang="">
   <div>
     <p>
-      <n-button round type="success" @click="addModule">新增模組</n-button>
+      <n-button
+        secondary
+        class="btn-region"
+        circle
+        type="info"
+        @click="addModule"
+      >
+        <Icon :size="20"> <AddFilled /> </Icon
+      ></n-button>
     </p>
 
-    <br>
+    <br />
 
     <p>
       <SingleModuleCard
@@ -18,9 +26,11 @@
 
 <script setup lang="ts">
 import { NButton } from "naive-ui";
+import { Icon } from "@vicons/utils";
 import { useModuleStore } from "@/stores/useModuleStore";
 import { Module } from "@/interface/module.interface";
 import { v4 as uuidv4 } from "uuid";
+import { AddFilled } from "@vicons/material";
 
 import SingleModuleCard from "@/components/blocks/SingleModuleCard.vue";
 
@@ -32,7 +42,6 @@ function debugOnly() {
 }
 
 const addModule = () => {
-
   // create a module instance
   const module = new Module({
     mid: uuidv4(),
@@ -42,7 +51,7 @@ const addModule = () => {
     server: "None",
   });
 
-  // hit api and get module's information 
+  // hit api and get module's information
 
   // update module info await and loading
 
@@ -53,11 +62,9 @@ const addModule = () => {
 };
 </script>
 
-<style lang="css">
-.right {
-  position: absolute;
-  right: 0px;
-  width: 300px;
-  padding: 10px;
+<style scoped>
+.btn-region {
+  float: right;
+  margin: 5px;
 }
 </style>

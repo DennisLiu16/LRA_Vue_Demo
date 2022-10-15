@@ -6,7 +6,7 @@
         secondary
         circle
         type="error"
-        style="float: right"
+        class="btn-region"
         @click="moduleStore.removeModule(props.mid)"
       >
         <Icon :size="20">
@@ -86,38 +86,10 @@
         </n-space>
       </n-space>
 
-      <p style="float: right">
-        <n-button
-          strong
-          round
-          type="primary"
-          @click="modifyCallBack"
-          v-if="!btnModifyState"
-        >
-          修改
-        </n-button>
-        <n-button
-          strong
-          round
-          type="error"
-          @click="cancelCallBack"
-          v-if="btnModifyState"
-        >
-          取消
-        </n-button>
-        <n-button
-          strong
-          round
-          type="primary"
-          @click="confirmCallBack"
-          v-if="btnModifyState"
-        >
-          確認
-        </n-button>
-
-        <!-- TODO: add button loading state -->
+      <p>
         <n-button
           v-if="!btnEnableState"
+          class="btn-region"
           strong
           secondary
           round
@@ -125,18 +97,56 @@
           :disabled="enableCheck()"
           @click="enableCallBack"
         >
-          傳輸
+          Start
         </n-button>
 
         <n-button
+          class="btn-region"
           strong
           round
           type="info"
           @click="enableCallBack"
           v-if="btnEnableState"
         >
-          終止
+          Stop
         </n-button>
+      </p>
+
+      <p>
+        <n-button
+          class="btn-region"
+          strong
+          round
+          type="primary"
+          @click="modifyCallBack"
+          v-if="!btnModifyState"
+        >
+          Modify
+        </n-button>
+
+        <n-button
+          class="btn-region"
+          strong
+          round
+          type="primary"
+          @click="confirmCallBack"
+          v-if="btnModifyState"
+        >
+          Confirm
+        </n-button>
+
+        <n-button
+          strong
+          class="btn-region"
+          round
+          type="error"
+          @click="cancelCallBack"
+          v-if="btnModifyState"
+        >
+          Cancel
+        </n-button>
+
+        <!-- TODO: add button loading state -->
       </p>
     </n-card>
     <br />
@@ -238,11 +248,9 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
 };
 </script>
 
-<style lang="css">
-.right {
-  position: absolute;
-  right: 0px;
-  width: 300px;
-  padding: 10px;
+<style scoped>
+.btn-region {
+  float: right;
+  margin: 5px;
 }
 </style>
