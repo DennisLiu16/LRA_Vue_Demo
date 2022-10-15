@@ -1,3 +1,5 @@
+<!-- The form is for adding server to serverlist -->
+
 <template>
   <n-button strong secondary circle type="info" @click="showModal = true">
     <Icon :size="20">
@@ -20,6 +22,7 @@
     <n-form
       ref=""
       :model="localServerInfo"
+      :rules="rules"
       label-placement="left"
       require-mark-placement="right-hanging"
       label-width="auto"
@@ -42,10 +45,11 @@
         secondary
         round
         type="primary"
+        :disabled="disableConfirmButton"
         @click="validateCallBack"
         style="float: right"
       >
-        確認
+        Confirm
       </n-button>
       <n-button
         strong
@@ -55,7 +59,7 @@
         @click="cancelCallBack"
         style="float: right"
       >
-        取消
+        Cancel
       </n-button>
     </template>
   </n-modal>
@@ -71,12 +75,15 @@ import {
   NInput,
   NInputNumber,
   type FormInst,
+  type FormItemRule,
+  type FormRules,
 } from "naive-ui";
 import { Icon } from "@vicons/utils";
 import { AddFilled } from "@vicons/material";
 import { v4 as uuidv4 } from "uuid";
 
 import type { IServerInfo } from "@/interface/server.interface";
+import { useServerStore } from "@/stores/useServerStore";
 
 const emit = defineEmits(["formSubmit"]);
 
@@ -84,6 +91,8 @@ const emit = defineEmits(["formSubmit"]);
 
 const showModal = ref(false);
 const formRef = ref<FormInst | null>(null);
+
+const serverStore = useServerStore();
 
 const localServerInfo = ref<IServerInfo>(createNewTmpServer());
 
@@ -106,7 +115,7 @@ const emitSubmit = () => {
     name: localServerInfo.value.name,
     ip: localServerInfo.value.ip,
     port: localServerInfo.value.port,
-    alive: localServerInfo.value.alive
+    alive: localServerInfo.value.alive,
   };
 
   emit("formSubmit", info);
@@ -133,6 +142,74 @@ const validateCallBack = () => {
 
 const cancelCallBack = () => {
   showModal.value = false;
+};
+
+// TODO: 可以移到檢查資料夾
+const disableConfirmButton = computed(() => {
+  const isNull =
+    localServerInfo.value.name === null ||
+    localServerInfo.value.ip === null ||
+    localServerInfo.value.port === null;
+
+  const nameNotValid: boolean = serverStore.serverBanNameList.includes(
+    localServerInfo.value.name
+  );
+
+  const portOutOfRange = () => {
+    const port = localServerInfo.value.port;
+    return port <= 0 || port > 65535;
+  };
+
+  const ipIsNotIPv4 = () => {
+    const regExpOfIPv4 = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
+    return !regExpOfIPv4.test(localServerInfo.value.ip);
+  };
+
+  console.log(isNull + "," + portOutOfRange() + "," + ipIsNotIPv4());
+
+  return isNull || nameNotValid || portOutOfRange() || ipIsNotIPv4();
+});
+
+const rules: FormRules = {
+  name: [
+    {
+      required: true,
+      validator(rule: FormItemRule, value: string) {
+        if (!value) return new Error("Name is required");
+        else if (serverStore.serverBanNameList.includes(value)) {
+          return new Error("Name can't be ' " + value + " '");
+        }
+      },
+      trigger: ["input", "blur"],
+    },
+  ],
+
+  port: [
+    {
+      required: true,
+      validator(rule: FormItemRule, value: string) {
+        if (!value) return new Error("Port is required");
+        else if (Number(value) <= 0 || Number(value) > 65535) {
+          return new Error("Port should be within 1 ~ 65535");
+        }
+      },
+      trigger: ["input", "blur"],
+    },
+  ],
+
+  ip: [
+    {
+      required: true,
+      validator(rule: FormItemRule, value: string) {
+        const regExpOfIPv4 = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
+        if (!value) return new Error("IP is required");
+        else if (!regExpOfIPv4.test(value)) {
+          return new Error("use IPv4 form");
+        }
+      },
+      trigger: ["input", "blur"],
+    },
+  ],
 };
 
 // style region

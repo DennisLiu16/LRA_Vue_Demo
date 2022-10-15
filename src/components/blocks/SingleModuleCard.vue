@@ -122,7 +122,7 @@
           secondary
           round
           type="info"
-          :disabled="!enableCheck()"
+          :disabled="enableCheck()"
           @click="enableCallBack"
         >
           傳輸
@@ -219,18 +219,18 @@ const enableCallBack = () => {
   /* TODO: Do something else here according to new state */
 };
 
+// if server is alive -> enable to connect
 const enableCheck = () => {
-  return (
-    serverStore.getServerName(moduleStore.getModuleInfo(props.mid).server) !==
-    serverStore.invalidName
-  );
+  const serveruuid = moduleStore.getModuleInfo(props.mid).server;
+  // if not default value: "None"
+  if (serveruuid !== "None")
+    return serverStore.getServerInfo(serveruuid).alive === true;
+  return false;
 };
 
 const addNewServerCallBack = (serverinfo: IServerInfo) => {
   // Add to serverList
-  console.log(serverinfo);
   serverStore.serverList.servers.push(serverinfo);
-  console.log(serverStore.serverList.servers);
 
   // TODO: hit api to check alive, modify data in serverList, not local var
   // if success -> modify localserver to target server

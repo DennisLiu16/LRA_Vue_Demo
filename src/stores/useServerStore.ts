@@ -10,13 +10,14 @@ import { NoEncryptionFilled } from "@vicons/material";
 export const useServerStore = defineStore(
   "useServerStore",
   () => {
-    const invalidName: string = "Not-found";
+    const substitudeName: string = "Not-found";
+    const serverBanNameList:string[] = ["None", substitudeName, "MainServer"];
 
     const serverList = reactive<{ servers: IServerInfo[] }>({ servers: [] });
 
     // make a select list of servers
     const serverSelect = computed(() => {
-      let selection: Array<any> = [{ label: "None", value: "None" }];
+      let selection: Array<any> = [{ label: "None", value: "None" }]; // default setting, no this server exists
 
       for (let server of serverList.servers) {
         const disableVal = server.alive ? false : true;
@@ -52,7 +53,7 @@ export const useServerStore = defineStore(
     const getServerName = (uuid: string) => {
       const candidate = serverList.servers.find((el) => el.uuid === uuid);
       if (candidate != undefined) return candidate.name;
-      return invalidName;
+      return substitudeName;
     };
 
     const getServerIndex = (uuid: string) => {
@@ -100,7 +101,8 @@ export const useServerStore = defineStore(
     return {
       serverList,
       serverSelect,
-      invalidName,
+      substitudeName,
+      serverBanNameList,
       getServerIndex,
       getServerInfo,
       getServerName,
