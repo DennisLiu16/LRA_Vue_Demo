@@ -165,8 +165,6 @@ const disableConfirmButton = computed(() => {
     return !regExpOfIPv4.test(localServerInfo.value.ip);
   };
 
-  console.log(isNull + "," + portOutOfRange() + "," + ipIsNotIPv4());
-
   return isNull || nameNotValid || portOutOfRange() || ipIsNotIPv4();
 });
 

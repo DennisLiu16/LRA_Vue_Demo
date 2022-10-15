@@ -14,13 +14,14 @@
       :mask-closable="false"
       :segmented="segmented"
       :bordered="false"
-      title="修改伺服器"
+      title="Mofify Server's Information"
       size="huge"
     >
       <template #header-extra></template>
       <n-form
         ref=""
         :model="localServerInfo"
+        :rules="rules"
         label-placement="left"
         require-mark-placement="right-hanging"
         label-width="auto"
@@ -42,11 +43,13 @@
           strong
           secondary
           round
+          :disabled="disableConfirmButton"
           type="primary"
           @click="ValidateCallBack"
           style="float: right"
+          class="btn-region"
         >
-          確認
+          Confirm
         </n-button>
         <n-button
           strong
@@ -55,15 +58,16 @@
           type="error"
           @click="CancelCallBack"
           style="float: right"
+          class="btn-region"
         >
-          取消
+          Cancel
         </n-button>
       </template>
     </n-modal>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import {
   NModal,
   NButton,
@@ -72,6 +76,8 @@ import {
   NInput,
   NInputNumber,
   type FormInst,
+  type FormItemRule,
+  type FormRules,
 } from "naive-ui";
 import { Icon } from "@vicons/utils";
 import { AppsList20Filled } from "@vicons/fluent";
@@ -93,6 +99,72 @@ const showModal = ref(false);
 const serverStore = useServerStore();
 
 const localServerInfo = ref(serverStore.getServerInfo(props.uuid));
+
+// TODO: 放進統一檔案內
+const disableConfirmButton = computed(() => {
+  const isNull =
+    localServerInfo.value.name === null ||
+    localServerInfo.value.ip === null ||
+    localServerInfo.value.port === null;
+
+  const nameNotValid: boolean = serverStore.serverBanNameList.includes(
+    localServerInfo.value.name
+  );
+
+  const portOutOfRange = () => {
+    const port = localServerInfo.value.port;
+    return port <= 0 || port > 65535;
+  };
+
+  const ipIsNotIPv4 = () => {
+    const regExpOfIPv4 = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
+    return !regExpOfIPv4.test(localServerInfo.value.ip);
+  };
+
+  return isNull || nameNotValid || portOutOfRange() || ipIsNotIPv4();
+});
+
+const rules: FormRules = {
+  name: [
+    {
+      required: true,
+      validator(rule: FormItemRule, value: string) {
+        if (!value) return new Error("Name is required");
+        else if (serverStore.serverBanNameList.includes(value)) {
+          return new Error("Name can't be ' " + value + " '");
+        }
+      },
+      trigger: ["input", "blur"],
+    },
+  ],
+
+  port: [
+    {
+      required: true,
+      validator(rule: FormItemRule, value: string) {
+        if (!value) return new Error("Port is required");
+        else if (Number(value) <= 0 || Number(value) > 65535) {
+          return new Error("Port should be within 1 ~ 65535");
+        }
+      },
+      trigger: ["input", "blur"],
+    },
+  ],
+
+  ip: [
+    {
+      required: true,
+      validator(rule: FormItemRule, value: string) {
+        const regExpOfIPv4 = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
+        if (!value) return new Error("IP is required");
+        else if (!regExpOfIPv4.test(value)) {
+          return new Error("use IPv4 form");
+        }
+      },
+      trigger: ["input", "blur"],
+    },
+  ],
+};
 
 const ValidateCallBack = () => {
   if (formRef.value?.validate === undefined) {
@@ -120,4 +192,9 @@ const CancelCallBack = () => {
 const bodyStyle = { width: "600px" };
 const segmented = { content: "soft", footer: "soft" };
 </script>
-<style scoped></style>
+<style scoped>
+.btn-region {
+  float: right;
+  margin: 5px;
+}
+</style>

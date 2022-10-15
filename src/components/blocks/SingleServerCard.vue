@@ -90,6 +90,6 @@ const modifyServerCallBack = (serverinfo: IServerInfo) => {
 <style scoped>
 .btn-region {
   float: right;
-  margin-right: 2px;
+  margin: 5px;
 }
 </style>
