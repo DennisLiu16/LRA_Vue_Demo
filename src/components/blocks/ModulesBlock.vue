@@ -11,8 +11,10 @@
     ></n-button>
   </div>
 
-  <div>
+  <!-- 排版的關鍵 -->
+  <div style="display: flex; flex-wrap: wrap">
     <SingleModuleCard
+      class="card-region"
       v-for="(module, i) in moduleStore.moduleList.modules"
       :key="module.mid"
       :mid="module.mid"
@@ -59,13 +61,16 @@ const addModule = () => {
 </script>
 
 <style scoped>
-
 .add-button-on-top {
   position: absoulte;
   z-index: 1;
 }
+
+.card-region {
+  margin: 2%;
+}
+
 .btn-region {
-  float: right;
   margin: 5px;
 }
 </style>

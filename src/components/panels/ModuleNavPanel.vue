@@ -1,15 +1,23 @@
 <!-- Module 右滑的 Panel -->
 
 <template>
-  <n-card > </n-card>
+  <n-card>
+    <nav>
+      <RouterLink to="/">Register</RouterLink>
+      <n-divider/>
+      <RouterLink to="/about">RT Plot</RouterLink>
+    </nav>
+  </n-card>
 </template>
 
 <script setup lang="ts">
 // lib
 import { ref, reactive, computed, type Ref } from "vue";
-import { NButton, NInput, NCard } from "naive-ui";
+import { NButton, NInput, NCard, NDivider } from "naive-ui";
 import { Icon } from "@vicons/utils";
 import VueHorizontal from "vue-horizontal";
+
+import { RouterLink, RouterView } from "vue-router";
 
 // store
 // import { useServerStore } from "@/stores/useServerStore";
@@ -18,9 +26,9 @@ import VueHorizontal from "vue-horizontal";
 // import { DeleteForeverRound } from "@vicons/material";
 
 // props and emit
-const props = defineProps({});
+// const props = defineProps({});
 
-const emits = defineEmits({});
+// const emits = defineEmits({});
 </script>
 
 <style scoped></style>

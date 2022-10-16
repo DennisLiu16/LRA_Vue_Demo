@@ -7,18 +7,13 @@ import { NDivider } from "naive-ui";
 
 <template>
   <main>
-
-    <n-divider dashed>
-      Servers
-    </n-divider>
+    <n-divider dashed> Servers </n-divider>
 
     <div class="block-region">
       <ServerBlock />
     </div>
 
-    <n-divider dashed>
-      Modules
-    </n-divider>
+    <n-divider dashed> Modules </n-divider>
 
     <div class="block-region">
       <ModulesBlock />
@@ -32,6 +27,6 @@ main {
 }
 
 .block-region {
-  margin: 5%;
+  margin: 2%;
 }
 </style>

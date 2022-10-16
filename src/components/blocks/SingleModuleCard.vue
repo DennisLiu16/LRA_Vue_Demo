@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <n-card class="card">
+  <!-- 讓兩個 card 水平排列 -->
+  <div style="display: flex">
+    <n-card class="card-main">
       <n-button
         strong
         secondary
@@ -149,7 +150,7 @@
         <!-- TODO: add button loading state -->
       </p>
     </n-card>
-    <br />
+    <ModuleNavPanel class="card-sub" />
   </div>
 </template>
 
@@ -173,6 +174,7 @@ import { useModuleStore } from "@/stores/useModuleStore";
 import { useServerStore } from "@/stores/useServerStore";
 
 import ServerForm from "@/components/form/ServerForm.vue";
+import ModuleNavPanel from "@/components/panels/ModuleNavPanel.vue";
 import type { IServerInfo } from "@/interface/server.interface";
 
 const props = defineProps({
@@ -249,12 +251,23 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
 </script>
 
 <style scoped>
-.card {
+.card-main {
+  z-index: 100;
   max-height: 300px;
-  max-width: 700px;
+  width: 450px;
+  position: relative; /*可疊加*/
 }
+
+.card-sub {
+  z-index: 99;
+  max-height: 300px;
+  width: 100px;
+  position: relative; /*可疊加*/
+}
+
 .btn-region {
   float: right;
   margin: 5px;
+  margin-top: 15px;
 }
 </style>
