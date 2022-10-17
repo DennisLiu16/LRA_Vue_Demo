@@ -155,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onUnmounted } from "vue";
 import {
   NButton,
   NInput,
@@ -248,6 +248,11 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
   // if success -> modify localserver to target server
   // if fail -> remove from list, ansyc function
 };
+
+onUnmounted(() => {
+  console.log('Module unmounted: ' + props.mid);
+});
+
 </script>
 
 <style scoped>

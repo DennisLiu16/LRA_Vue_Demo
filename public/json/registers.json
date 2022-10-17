@@ -1,0 +1,11 @@
+
+{
+  "_comment": "use fetch instead import",
+  "registers": [{
+    "name": "Reg1",
+    "defaultVal": "0x21",
+    "description": "Example reg"
+  },{
+    
+  }]
+}

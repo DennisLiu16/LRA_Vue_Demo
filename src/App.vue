@@ -12,7 +12,8 @@ import HelloWorld from './components/HelloWorld.vue'
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/base/registers">Register</RouterLink>
+        <RouterLink to="/base/real-time-plot">RT Plot</RouterLink>
       </nav>
     </div>
   </header>
