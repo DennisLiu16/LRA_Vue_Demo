@@ -246,7 +246,6 @@ const enableCheck = () => {
     return serverStore.getServerInfo(serveruuid).alive === true;
   return false;
 };
-
 const addNewServerCallBack = (serverinfo: IServerInfo) => {
   // Add to serverList
   serverStore.serverList.servers.push(serverinfo);
@@ -258,15 +257,12 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
 
 onMounted(() => {
   // if server is valid -> reconnect
+  // pinia can be used
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(() => {});
 
-});
-
-onUnmounted(() => {
-
-});
+onUnmounted(() => {});
 </script>
 
 <style scoped>

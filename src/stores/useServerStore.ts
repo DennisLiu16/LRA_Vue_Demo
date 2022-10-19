@@ -4,14 +4,12 @@ import { stringify, parse } from "zipson";
 import { v4 as uuidv4 } from "uuid";
 
 import type { IServerInfo } from "@/interface/server.interface";
-import selection from "naive-ui/es/_internal/selection";
-import { NoEncryptionFilled } from "@vicons/material";
 
 export const useServerStore = defineStore(
   "useServerStore",
   () => {
     const substitudeName: string = "Not-found";
-    const serverBanNameList:string[] = ["None", substitudeName, "MainServer"];
+    const serverBanNameList: string[] = ["None", substitudeName, "MainServer"];
 
     const serverList = reactive<{ servers: IServerInfo[] }>({ servers: [] });
 
@@ -41,7 +39,10 @@ export const useServerStore = defineStore(
         const localServer = {
           uuid: uuid,
           name: "MainServer",
-          ip: window.location.hostname,
+          ip:
+            window.location.hostname === "localhost"
+              ? "127.0.0.1"
+              : window.location.hostname,
           port: parseInt(window.location.port),
           alive: false,
         } as IServerInfo;

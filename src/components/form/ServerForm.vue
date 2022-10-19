@@ -47,7 +47,7 @@
         type="primary"
         :disabled="disableConfirmButton"
         @click="validateCallBack"
-        style="float: right"
+        class="btn-region"
       >
         Confirm
       </n-button>
@@ -57,7 +57,7 @@
         round
         type="error"
         @click="cancelCallBack"
-        style="float: right"
+        class="btn-region"
       >
         Cancel
       </n-button>
@@ -216,6 +216,11 @@ const segmented = { content: "soft", footer: "soft" };
 </script>
 
 <style scoped>
+.btn-region {
+  float: right;
+  margin: 5px;
+}
+
 template {
   font-family: Helvetica, sans-serif;
 }

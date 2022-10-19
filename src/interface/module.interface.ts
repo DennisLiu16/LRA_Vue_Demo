@@ -13,10 +13,11 @@ export class Module implements IModuleInfo {
   port: number;
   server: string;
 
-
   connectState: "ON" | "OFF" | "UNKNOWN"; // connection led state
   enable: "ON" | "OFF"; // enable button state
   onProgram: String[]; // record programs running in module
+
+  registers: Object;
 
   constructor(init: IModuleInfo) {
     this.mid = init.mid;
@@ -27,5 +28,6 @@ export class Module implements IModuleInfo {
     this.connectState = "OFF";
     this.enable = "OFF";
     this.onProgram = [];
+    this.registers = {};
   }
 }
