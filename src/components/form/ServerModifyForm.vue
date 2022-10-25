@@ -14,7 +14,8 @@
       :mask-closable="false"
       :segmented="segmented"
       :bordered="false"
-      title="Mofify Server's Information"
+      :on-after-leave="LeaveCallBack"
+      title="Modify Server's Information"
       size="huge"
     >
       <template #header-extra></template>
@@ -56,7 +57,7 @@
           secondary
           round
           type="error"
-          @click="CancelCallBack"
+          @click="LeaveCallBack"
           style="float: right"
           class="btn-region"
         >
@@ -184,8 +185,14 @@ const ValidateCallBack = () => {
   }
 };
 
-const CancelCallBack = () => {
+const LeaveCallBack = () => {
   showModal.value = false;
+  
+  // resume info
+  const data = serverStore.getServerInfo(props.uuid);
+  localServerInfo.value.name = data.name;
+  localServerInfo.value.ip = data.ip;
+  localServerInfo.value.port = data.port;
 };
 
 // style region
