@@ -1,34 +1,5 @@
-// ref to https://github.com/likaia/vue-native-websocket-vue3
-// https://stackoverflow.com/questions/68811762/access-class-method-via-vue-3-vuex-state-typescript
-// 是不是 interface 可以當作有沒有 activate 的根據? No
-// 暫時 Abort -> websocket-ts
+// 未來可以將方程式從 string type 轉換成 Function type 的 magicMethod
+// https://stackoverflow.com/questions/62446219/typescript-javascript-call-function-by-string-name
 
-interface WebSocketInfo<T = any> {
-  belongTo: {
-    type: "server" | "module";
-    uuid: string;
-  };
-  format: string;
-  reconnection?: boolean;
-  reconnectionAttempts?: number;
-  reconnectionDelay?: number;
-  connectManually?: boolean;
-  store?: T;
-  protocol?: string;
-  webSocket?: WebSocket | undefined;
-}
-
-export interface IMyWebSocket {
-  readonly format: string;
-  readonly opt: WebSocketInfo;
-  readonly reconnectionAttempts: number;
-  readonly reconnectionDelay: number;
-
-  reconnection: boolean;
-}
-
-export class MyWebSocket implements IMyWebSocket {
-  private connectionUrl: string;
-}
-
-// 或許可以定義 websocket 是屬於 server 還是 module
+// 未來需要將websocket 儲存在 pinia 的擴展，初始階段直接使用 websocket 的 lib 即可
+// https://juejin.cn/post/7055469205759459336

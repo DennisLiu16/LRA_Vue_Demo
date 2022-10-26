@@ -3,9 +3,27 @@ import { onMounted } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 import HelloWorld from "./components/HelloWorld.vue";
 
+const socket = new WebSocket("ws://localhost:8765");
+
+socket.addEventListener("open", () => {
+  // send a message to the server
+  socket.send(
+    JSON.stringify({
+      type: "hello from client",
+      content: [3, "4"],
+    })
+  );
+});
+
+socket.addEventListener("message", ({ data }) => {
+  const packet = JSON.parse(data);
+
+  console.log(packet);
+});
+
 onMounted(() => {
   console.log("App mounted");
-})
+});
 </script>
 
 <template>
