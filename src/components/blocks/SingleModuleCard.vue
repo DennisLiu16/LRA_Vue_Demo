@@ -162,6 +162,7 @@ import {
   onUnmounted,
   onMounted,
   onBeforeUnmount,
+  type Ref,
 } from "vue";
 import {
   NButton,
@@ -171,11 +172,11 @@ import {
   NSelect,
   NInputNumber,
 } from "naive-ui";
+
 import { Icon } from "@vicons/utils";
 import { DeleteForeverRound } from "@vicons/material";
 
 import type { IModuleInfo, Module } from "@/interface/module.interface";
-import type { Ref } from "vue";
 
 import { useModuleStore } from "@/stores/useModuleStore";
 import { useServerStore } from "@/stores/useServerStore";
@@ -183,6 +184,13 @@ import { useServerStore } from "@/stores/useServerStore";
 import ServerForm from "@/components/form/ServerForm.vue";
 import ModuleNavPanel from "@/components/panels/ModuleNavPanel.vue";
 import type { IServerInfo } from "@/interface/server.interface";
+import {
+  WsInstance,
+  type wsInfo,
+  type wsOpt,
+} from "@/interface/myWebSocket.interface";
+
+import { makeWsUrl } from "@/composables/wsUtil";
 
 const props = defineProps({
   mid: {
@@ -208,6 +216,34 @@ const btnModifyState = ref(false);
 const btnEnableState = ref(false);
 const btnAddNewServer = ref(false);
 
+// module websocket related
+// 透過在 local 創建 ws 可以拿到 module card 的資訊，同時在 local 創建 callback 可保有一致性且能拿到 ws 實例的 public 參數
+
+let ws: WsInstance;
+const wsProtocal: "ws" | "wss" = "ws";
+
+const wsOnOpenCallback = () => {
+  console.log(`${localModuleInfo.name} creates a new websocket to: ${ws.info.url}`);
+
+  // TODO: send server's info to module, module will create a websocket client to the server
+  // if(ws.mode === "direct") ...
+  // TODO: send a request to get registers' value
+}
+
+const wsOnCloseCallback = (ev: CloseEvent) => {
+  console.log(`${localModuleInfo.name} cancel websocket to: ${ws.info.url} owing to: ${ev.reason}`);
+}
+
+const wsOnMsgCallback = (ev:MessageEvent) => {
+  console.log(`${localModuleInfo.name} get msg: \n ${ev.data}`);
+}
+
+const wsOnErrorCallback = (ev:Event) => {
+  console.log(ev);
+}
+
+// module websocket related
+
 const onlyAllowNumber = (value: string) => !value || /^\d+$/.test(value);
 
 const modifyBooleanState = (refbool: Ref<boolean>) => {
@@ -229,13 +265,36 @@ const cancelCallBack = () => {
 };
 
 const confirmCallBack = () => {
+  const info = moduleStore.getModuleInfo(props.mid);
   moduleStore.updateModule(props.mid, localModuleInfo);
   modifyBooleanState(btnModifyState);
+
+  // check btnEnableState (ws connection state) -> off
+  if ((info.ip !== localModuleInfo.ip) || info.port) {
+    // TODO: turn off and callback
+  }
 };
 
 const enableCallBack = () => {
   modifyBooleanState(btnEnableState);
   /* TODO: Do something else here according to new state */
+  if (btnEnableState.value === true) {
+
+    ws = new WsInstance({
+      url: makeWsUrl(wsProtocal, localModuleInfo.ip, localModuleInfo.port),
+      mid: props.mid,
+    });
+
+    // register callbacks
+    ws.ws.onopen = wsOnOpenCallback;
+    ws.ws.onclose = wsOnCloseCallback;
+    ws.ws.onmessage = wsOnMsgCallback;
+    ws.ws.onerror = wsOnErrorCallback;
+
+
+  } else {
+    ws.ws.close();
+  }
 };
 
 // if server is alive -> enable to connect
@@ -256,7 +315,7 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
 };
 
 onMounted(() => {
-  // if server is valid -> reconnect
+  // TODO: if server is valid -> reconnect
   // pinia can be used
 });
 
