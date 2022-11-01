@@ -1,5 +1,5 @@
 <!-- Module 右滑的 Panel -->
-
+<!-- TODO: 改用 naive ui Menu 來做 disable link -->
 <template>
   <n-card>
     <nav>

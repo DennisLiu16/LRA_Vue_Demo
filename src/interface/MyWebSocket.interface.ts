@@ -8,44 +8,79 @@
 export class WsInstance {
   info: wsInfo;
   mode: "direct" | "broadcast" = "broadcast"; // direct 是模組直連; broadcast 是透過網頁轉接
-  ws: WebSocket;
+  target: "server" | "module" = "module"; // connection target
+  private _ws: WebSocket | null = null;
 
-  constructor(info: wsInfo, mode?: "direct" | "broadcast") {
+  constructor(
+    info: wsInfo,
+    mode?: "direct" | "broadcast",
+    target?: "server" | "module"
+  ) {
     this.info = info;
     if (mode !== undefined) this.mode = mode;
-    this.ws = new WebSocket(info.url);
-
-    // setting callback
-
-    this.ws.onopen =
-      this.info.opt?.onOpenCallback != undefined
-        ? this.info.opt?.onOpenCallback
-        : null;
-
-    this.ws.onclose =
-      this.info?.opt?.onCloseCallback != undefined
-        ? this.info?.opt?.onCloseCallback
-        : null;
-
-    this.ws.onmessage =
-      this.info.opt?.onMsgCallback != undefined
-        ? this.info.opt?.onMsgCallback
-        : null;
-
-    this.ws.onerror =
-      this.info.opt?.onErrorCallback != undefined
-        ? this.info.opt?.onErrorCallback
-        : null;
+    if (target !== undefined) this.target = target;
   }
 
   send(data: any) {
-    this.ws.send(data);
+    if (this._ws !== null)
+      this._ws.send(data);
+    else {
+      console.error(`_ws: ${this.info.url} hasn't built yet! Please call reconnecWs() first!`);
+    }
+  }
+
+  // close WsInstance.ws, and assign to null
+  closeWs() {
+    if(this._ws !== null){
+      this._ws.close();
+      this._ws = null;
+    }
+  }
+
+  connectWs() {
+    this.reconnectWs();
+  }
+
+  reconnectWs() {
+    this._ws = new WebSocket(this.info.url);
+    this.updateCallbacks();
+  }
+
+  getWsReadyState() {
+    if(this._ws !== null) {
+      return this._ws.readyState;
+    } else {
+      return null;
+    }
+  }
+
+  updateCallbacks(){
+    if (this._ws === null) {
+      console.error(`_ws in WsInstance: ${this.info.mid} is null, call reconnect() first`);
+      return;
+    }
+
+    if(this.info.opt?.onOpenCallback !== undefined){
+      this._ws.onopen = this.info.opt.onOpenCallback;
+    }
+
+    if(this.info.opt?.onCloseCallback !== undefined){
+      this._ws.onclose = this.info.opt.onCloseCallback;
+    }
+
+    if(this.info.opt?.onMsgCallback !== undefined){
+      this._ws.onmessage = this.info.opt.onMsgCallback;
+    }
+
+    if(this.info.opt?.onErrorCallback !== undefined){
+      this._ws.onerror = this.info.opt.onErrorCallback;
+    }
   }
 }
 
 export interface wsInfo {
-  readonly url: string;
-  mid?: string; // machine uid
+  url: string;
+  mid: string; // machine uid
   opt?: wsOpt;
 }
 

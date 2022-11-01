@@ -13,11 +13,11 @@ export class Module implements IModuleInfo {
   port: number;
   server: string;
 
-  connectState: "ON" | "OFF" | "UNKNOWN"; // connection led state
-  enable: "ON" | "OFF"; // enable button state
+  // connectState: "ON" | "OFF" | "UNKNOWN"; TODO: maintain by websocket.readystate?
+  enableState: boolean; // enable button state
   onProgram: String[]; // record programs running in module
 
-  registers: Object;
+  // registers: Object; // move to useWebSStore
 
   constructor(init: IModuleInfo) {
     this.mid = init.mid;
@@ -25,9 +25,7 @@ export class Module implements IModuleInfo {
     this.ip = init.ip;
     this.port = init.port;
     this.server = init.server;
-    this.connectState = "OFF";
-    this.enable = "OFF";
+    this.enableState = false;
     this.onProgram = [];
-    this.registers = {};
   }
 }

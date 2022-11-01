@@ -180,6 +180,7 @@ import type { IModuleInfo, Module } from "@/interface/module.interface";
 
 import { useModuleStore } from "@/stores/useModuleStore";
 import { useServerStore } from "@/stores/useServerStore";
+import { useWebSocketStore } from "@/stores/useWebSocketStore";
 
 import ServerForm from "@/components/form/ServerForm.vue";
 import ModuleNavPanel from "@/components/panels/ModuleNavPanel.vue";
@@ -200,8 +201,11 @@ const props = defineProps({
   },
 });
 
+// Note that WsInstance is not WebSocket, it's a wrapper for WebSocket
+
 const moduleStore = useModuleStore();
 const serverStore = useServerStore();
+const wsStore = useWebSocketStore();
 
 const localModuleInfo = reactive<IModuleInfo>(
   moduleStore.getModuleInfo(props.mid)
@@ -213,34 +217,41 @@ const localModuleInfo = reactive<IModuleInfo>(
 // });
 
 const btnModifyState = ref(false);
-const btnEnableState = ref(false);
+const btnEnableState = ref(moduleStore.getModuleEnableState(props.mid));
 const btnAddNewServer = ref(false);
 
 // module websocket related
 // 透過在 local 創建 ws 可以拿到 module card 的資訊，同時在 local 創建 callback 可保有一致性且能拿到 ws 實例的 public 參數
 
-let ws: WsInstance;
-const wsProtocal: "ws" | "wss" = "ws";
+const wsProtocol: "ws" | "wss" = "ws";
 
 const wsOnOpenCallback = () => {
-  console.log(`${localModuleInfo.name} creates a new websocket to: ${ws.info.url}`);
+  console.log(
+    `${localModuleInfo.name} creates a new websocket to: ${
+      tryToGetWsInstance(props.mid)?.info.url
+    } successfully`
+  );
 
   // TODO: send server's info to module, module will create a websocket client to the server
   // if(ws.mode === "direct") ...
   // TODO: send a request to get registers' value
-}
+};
 
 const wsOnCloseCallback = (ev: CloseEvent) => {
-  console.log(`${localModuleInfo.name} cancel websocket to: ${ws.info.url} owing to: ${ev.reason}`);
-}
+  console.log(
+    `Module: ${localModuleInfo.name} cancel websocket to: ${
+      tryToGetWsInstance(props.mid)?.info.url
+    } owing to: ${ev.reason}`
+  );
+};
 
-const wsOnMsgCallback = (ev:MessageEvent) => {
+const wsOnMsgCallback = (ev: MessageEvent) => {
   console.log(`${localModuleInfo.name} get msg: \n ${ev.data}`);
-}
+};
 
-const wsOnErrorCallback = (ev:Event) => {
+const wsOnErrorCallback = (ev: Event) => {
   console.log(ev);
-}
+};
 
 // module websocket related
 
@@ -248,6 +259,13 @@ const onlyAllowNumber = (value: string) => !value || /^\d+$/.test(value);
 
 const modifyBooleanState = (refbool: Ref<boolean>) => {
   refbool.value = !refbool.value;
+};
+
+// callbacks //
+
+const removeModuleCallback = () => {
+  moduleStore.removeModule(props.mid);
+  wsStore.removeModuleWs(props.mid);
 };
 
 const modifyCallBack = () => {
@@ -266,38 +284,69 @@ const cancelCallBack = () => {
 
 const confirmCallBack = () => {
   const info = moduleStore.getModuleInfo(props.mid);
+
+  let needReconnect = isCriticalModify(info, localModuleInfo);
+
+  if (needReconnect) {
+    console.log(
+      `module changes info`,
+      `Origin: ${info}`,
+      `New: ${localModuleInfo}`
+    );
+
+    let wsIns = tryToGetWsInstance(props.mid);
+    if (wsIns !== null) {
+      // 本來就是連接的，先關
+      if (btnEnableState.value === true) {
+        // TODO: make a function on modify to handle all modify case?
+        {
+          wsIns.closeWs();
+          // update url
+          wsIns.info.url = makeWsUrl(
+            wsProtocol,
+            localModuleInfo.ip,
+            localModuleInfo.port
+          );
+          // TODO: server critical change: do ??
+
+          // TODO: async reconnect and loading
+        }
+      } else {
+        wsIns.info.url = makeWsUrl(
+          wsProtocol,
+          localModuleInfo.ip,
+          localModuleInfo.port
+        );
+      }
+    }
+  }
+
   moduleStore.updateModule(props.mid, localModuleInfo);
   modifyBooleanState(btnModifyState);
 
-  // check btnEnableState (ws connection state) -> off
-  if ((info.ip !== localModuleInfo.ip) || info.port) {
-    // TODO: turn off and callback
-  }
+  // debug only
+  const ff = wsStore.getModuleWs(props.mid);
+  if (ff !== null) ff.info.mid = "aa";
+  console.log(wsStore.moduleWs.ws); // suppose one has mid "aa" for reactive sake
 };
+
+async function asyncConnect() {
+  // change state
+
+  // then 
+}
 
 const enableCallBack = () => {
   modifyBooleanState(btnEnableState);
-  /* TODO: Do something else here according to new state */
-  if (btnEnableState.value === true) {
 
-    ws = new WsInstance({
-      url: makeWsUrl(wsProtocal, localModuleInfo.ip, localModuleInfo.port),
-      mid: props.mid,
-    });
-
-    // register callbacks
-    ws.ws.onopen = wsOnOpenCallback;
-    ws.ws.onclose = wsOnCloseCallback;
-    ws.ws.onmessage = wsOnMsgCallback;
-    ws.ws.onerror = wsOnErrorCallback;
-
-
-  } else {
-    ws.ws.close();
+  // close or reconnect the websocket async and loading mark on btn
+  if(btnEnableState.value === false) tryToGetWsInstance(props.mid)?.closeWs();
+  else {
+    asyncConnect();
   }
 };
 
-// if server is alive -> enable to connect
+// if server is alive -> enable to connect, start 按鈕會不會亮的檢查程式
 const enableCheck = () => {
   const serveruuid = moduleStore.getModuleInfo(props.mid).server;
   // if not default value: "None"
@@ -305,21 +354,88 @@ const enableCheck = () => {
     return serverStore.getServerInfo(serveruuid).alive === true;
   return false;
 };
+
 const addNewServerCallBack = (serverinfo: IServerInfo) => {
   // Add to serverList
   serverStore.serverList.servers.push(serverinfo);
+
+  // TODO: create a new websocket instance here if info valid (ws_tmp)
 
   // TODO: hit api to check alive, modify data in serverList, not local var
   // if success -> modify localserver to target server
   // if fail -> remove from list, ansyc function
 };
 
+const tryToGetWsInstance = (mid: string) => {
+  return wsStore.getModuleWs(mid);
+};
+
+/** Verify or generate valid WsInstance and get the instance back.
+ Make sure tryToGetWsInstance() always valid after onMounted*/
+const verifyWsInstance = (mid: string) => {
+  const tmpWs = tryToGetWsInstance(mid);
+  if (tmpWs === null) {
+    return createWsInstance();
+  } else if (!(tmpWs instanceof WsInstance)) {
+    wsStore.removeModuleWs(mid);
+    return createWsInstance();
+  } // else { do nothing }
+  return tmpWs;
+};
+
+/** critical modify for websocket */
+const isCriticalModify = (
+  storeInfo: IModuleInfo,
+  localInfo: IModuleInfo
+): boolean => {
+  const directServerChanged: boolean =
+    storeInfo.server !== localInfo.server &&
+    tryToGetWsInstance(props.mid)?.mode === "direct";
+  const ipChanged: boolean = storeInfo.ip !== localInfo.ip;
+  const portChanged: boolean = storeInfo.port !== localInfo.port;
+  // TODO: Callbacks Change
+  return directServerChanged || ipChanged || portChanged;
+};
+
+////////////////////////////////////////
+function createWsInstance() {
+  const _opt: wsOpt = {
+    onOpenCallback: wsOnOpenCallback,
+    onCloseCallback: wsOnCloseCallback,
+    onMsgCallback: wsOnMsgCallback,
+    onErrorCallback: wsOnErrorCallback,
+  };
+
+  const _info: wsInfo = {
+    url: makeWsUrl(wsProtocol, localModuleInfo.ip, localModuleInfo.port),
+    mid: props.mid,
+    opt: _opt,
+  };
+
+  return wsStore.addModuleWs(_wsCreate(_info, "broadcast", "module"));
+}
+
+/**  should not use directly */
+function _wsCreate(
+  info: wsInfo,
+  mode: "broadcast" | "direct",
+  target: "server" | "module"
+): WsInstance {
+  return new WsInstance(info, mode, target);
+}
+
 onMounted(() => {
-  // TODO: if server is valid -> reconnect
-  // pinia can be used
+  const ws = verifyWsInstance(props.mid);
+  if (btnEnableState.value === true && ws?.getWsReadyState() === null) {
+    // TODO: WebSocket is null then reconnect async and loading
+    ws?.reconnectWs();
+  }
 });
 
-onBeforeUnmount(() => {});
+onBeforeUnmount(() => {
+  // update enablestate to store
+  moduleStore.updateModuleEnableState(props.mid, btnEnableState.value);
+});
 
 onUnmounted(() => {});
 </script>

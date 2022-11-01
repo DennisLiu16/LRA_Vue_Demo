@@ -1,4 +1,4 @@
-import { ref, computed, reactive } from "vue";
+import { ref, computed, reactive, type Ref } from "vue";
 import { defineStore } from "pinia";
 import { stringify, parse } from "zipson";
 
@@ -16,7 +16,7 @@ export const useModuleStore = defineStore(
     // mid: module id
     const removeModule = (mid: string) => {
       const idx = getModuleIndex(mid);
-      if (idx !== undefined) {
+      if (idx !== -1) {
         moduleList.modules.splice(idx, 1);
       }
     };
@@ -31,7 +31,7 @@ export const useModuleStore = defineStore(
     const getModuleInfo = (mid: string) => {
       const idx = getModuleIndex(mid);
       const info = {} as IModuleInfo;
-      if (idx !== undefined) {
+      if (idx !== -1) {
         info.ip = moduleList.modules[idx].ip;
         info.name = moduleList.modules[idx].name;
         info.port = moduleList.modules[idx].port;
@@ -40,9 +40,19 @@ export const useModuleStore = defineStore(
       return info;
     };
 
+    const getModuleEnableState = (mid: string) => {
+      const idx = getModuleIndex(mid);
+      return moduleList.modules[idx].enableState;
+    };
+
+    const updateModuleEnableState = (mid: string, newState: boolean) => {
+      const idx = getModuleIndex(mid);
+      moduleList.modules[idx].enableState = newState;
+    }
+
     const updateModule = (mid: string, obj: IModuleInfo) => {
       const idx = getModuleIndex(mid);
-      if (idx !== undefined) {
+      if (idx !== -1) {
         moduleList.modules[idx].ip = obj.ip;
         moduleList.modules[idx].name = obj.name;
         moduleList.modules[idx].port = obj.port;
@@ -56,6 +66,8 @@ export const useModuleStore = defineStore(
       removeModule,
       updateModule,
       getModuleInfo,
+      getModuleEnableState,
+      updateModuleEnableState,
     };
   },
   {

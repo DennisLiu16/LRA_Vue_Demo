@@ -2,6 +2,7 @@
   <n-card>
     <div>
       <div>
+        <!-- TODO: removeServer 改成 local， 跳出警告視窗 -->
         <n-button
           class="btn-region"
           strong
@@ -14,7 +15,10 @@
         ></n-button>
       </div>
       <div class="btn-region">
-        <ServerModifyForm :uuid="props.uuid" @form-modified="modifyServerCallBack" />
+        <ServerModifyForm
+          :uuid="props.uuid"
+          @form-modified="modifyServerCallBack"
+        />
       </div>
     </div>
 
@@ -49,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { NButton, NCard, NSpace } from "naive-ui";
 import { useServerStore } from "@/stores/useServerStore";
 import { Icon } from "@vicons/utils";
@@ -58,6 +62,7 @@ import { AppsList20Filled } from "@vicons/fluent";
 import ServerModifyForm from "@/components/form/ServerModifyForm.vue";
 
 import type { IServerInfo } from "@/interface/server.interface";
+import type { WsInstance } from "@/interface/myWebSocket.interface";
 
 const props = defineProps({
   uuid: {
@@ -65,6 +70,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+let ws: WsInstance;
 
 const serverStore = useServerStore();
 
@@ -79,12 +86,19 @@ const tryToGetResponsiveServerInfo = computed(() => {
 const modifyServerCallBack = (serverinfo: IServerInfo) => {
   // Add to serverList
   serverStore.updateServerInfo(props.uuid, serverinfo);
+
+  // TODO: update serverWs.ws info also reconnect
   console.log(serverStore.serverList.servers);
 
   // TODO: hit api to check alive, modify data in serverList, not local var
   // if success -> modify localserver to target server
   // if fail -> remove from list, ansyc function
 };
+
+onMounted(() => {
+  // get ws if serverWs exists, or create a new connection
+});
+
 </script>
 
 <style scoped>

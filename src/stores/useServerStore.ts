@@ -60,7 +60,7 @@ export const useServerStore = defineStore(
 
     const getServerIndex = (uuid: string) => {
       const idx = serverList.servers.findIndex((el) => el.uuid === uuid);
-      if (idx != undefined) return idx;
+      if (idx !== -1) return idx;
       else {
         console.log("Index of server can't find");
         throw new Error("Index of server can't find");
@@ -78,8 +78,9 @@ export const useServerStore = defineStore(
       return info;
     };
 
+    /* You should check serverWs by yourself! */
     const removeServer = (uuid: string) => {
-      // if not found, throw internal error
+      // if not found, getServerIndex throw internal error
       const idx = getServerIndex(uuid);
       serverList.servers.splice(idx, 1);
     };

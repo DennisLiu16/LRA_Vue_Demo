@@ -39,6 +39,7 @@ onMounted(() => {
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
 
+      <!-- TODO: enable only if module is connected -->
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/base/registers">Register</RouterLink>

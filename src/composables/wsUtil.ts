@@ -1,5 +1,6 @@
 import { isPortOutOfRange } from "./netUtil";
 
+// request or update => send type
 const wsLraMsgRequestType = [
   // only type in json
   "regAllRequire",
@@ -7,22 +8,32 @@ const wsLraMsgRequestType = [
   "regAdxlRequire",
   "dataNewestRequire",
   "dataRealTimeRequire",
-  "dataRealTimeStop",
-  "moduleInfo",
+  "dataRealTimeStopRequire",
+  "moduleInfoRequire",
 ] as const;
 
 const wsLraMsgUpdateType = [
   // type and data in json
+  "serverInfoUpdate",
   "regAllUpdate",
   "regDrvUpdate",
   "regAdxlUpdate",
   "drvCmdUpdate",
 ] as const;
 
+const wsLraMsgReciveType = [
+  "recDataRT",
+  "recRegAll",
+  "recRegDrv",
+  "recRegAdxl",
+]
+
 type WsLraMsgRequestType = typeof wsLraMsgRequestType[number];
 type WsLraMsgUpdateType = typeof wsLraMsgUpdateType[number];
 
-export type WSLraMsgType =
+export type wsLraMsgReciveType = typeof wsLraMsgReciveType[number];
+
+export type WSLraMsgSendType =
   | typeof wsLraMsgRequestType[number]
   | typeof wsLraMsgUpdateType[number];
 
@@ -37,14 +48,14 @@ export function makeWsUrl(
 }
 
 export function makeWsRequest(
-  _type: WSLraMsgType,
+  _type: WSLraMsgSendType,
   _data?: object
 ): object | never {
   if (isRequestType(_type)) {
     return {
       type: _type,
     };
-  } else if (isUpdateType(_type) && typeof _data !== undefined) {
+  } else if (isUpdateType(_type) && typeof _data !== "undefined") {
     return {
       type: _type,
       data: _data,
