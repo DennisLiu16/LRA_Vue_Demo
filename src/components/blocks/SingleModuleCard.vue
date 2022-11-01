@@ -243,7 +243,8 @@ const wsOnCloseCallback = (ev: CloseEvent) => {
   console.log(
     `Module: ${localModuleInfo.name} cancel websocket to: ${
       tryToGetWsInstance(props.mid)?.info.url
-    } owing to: ${ev}`
+    } owing to: `,
+    ev
   );
 };
 
@@ -292,9 +293,11 @@ const confirmCallBack = () => {
 
   if (needReconnect) {
     console.log(
-      `module changes info`,
-      `Origin: ${info}`,
-      `New: ${localModuleInfo}`
+      "module changes info",
+      "Origin: ",
+      info,
+      "New: ",
+      localModuleInfo
     );
 
     let wsIns = tryToGetWsInstance(props.mid);
@@ -336,7 +339,6 @@ async function asyncConnect() {
   let ws = tryToGetWsInstance(props.mid);
   try {
     const wsConnectState = await ws?.connectWs();
-    console.log(wsConnectState);
     if (wsConnectState === WsInstance.OPEN) {
       modifyBooleanState(btnEnableState);
     }
@@ -356,17 +358,21 @@ const enableCallBack = () => {
   else {
     asyncConnect();
   }
+
+  moduleStore.updateModuleEnableState(props.mid, btnEnableState.value);
 };
 
 // if server is alive -> enable to connect, start 按鈕會不會亮的檢查程式
 const enableCheck = () => {
   const serveruuid = moduleStore.getModuleInfo(props.mid).server;
   // if not default value: "None"
-  if (serveruuid !== "None")
+
+  if (serveruuid !== "None") {
     // BUG: 等下記得開起來
-    return true;
-    // return serverStore.getServerInfo(serveruuid).alive === true;
-  return false;
+    return false;
+    return serverStore.getServerInfo(serveruuid).alive === true;
+  }
+  return true;
 };
 
 const addNewServerCallBack = (serverinfo: IServerInfo) => {
@@ -446,10 +452,7 @@ onMounted(() => {
   }
 });
 
-onBeforeUnmount(() => {
-  // update enablestate to store
-  moduleStore.updateModuleEnableState(props.mid, btnEnableState.value);
-});
+onBeforeUnmount(() => {});
 
 onUnmounted(() => {});
 </script>

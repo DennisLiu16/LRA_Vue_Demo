@@ -13,6 +13,10 @@ export const useModuleStore = defineStore(
       moduleList.modules.push(obj);
     };
 
+    const isModuleExist = (mid: string) => {
+      return moduleList.modules.some(module => module.mid === mid);
+    }
+
     // mid: module id
     const removeModule = (mid: string) => {
       const idx = getModuleIndex(mid);
@@ -62,6 +66,7 @@ export const useModuleStore = defineStore(
 
     return {
       moduleList,
+      isModuleExist,
       addModule,
       removeModule,
       updateModule,
