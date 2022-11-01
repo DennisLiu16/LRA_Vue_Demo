@@ -96,6 +96,7 @@
           round
           type="info"
           :disabled="enableCheck()"
+          :loading="btnEnableLoading"
           @click="enableCallBack"
         >
           Start
@@ -219,6 +220,7 @@ const localModuleInfo = reactive<IModuleInfo>(
 const btnModifyState = ref(false);
 const btnEnableState = ref(moduleStore.getModuleEnableState(props.mid));
 const btnAddNewServer = ref(false);
+const btnEnableLoading = ref(false);
 
 // module websocket related
 // 透過在 local 創建 ws 可以拿到 module card 的資訊，同時在 local 創建 callback 可保有一致性且能拿到 ws 實例的 public 參數
@@ -241,16 +243,17 @@ const wsOnCloseCallback = (ev: CloseEvent) => {
   console.log(
     `Module: ${localModuleInfo.name} cancel websocket to: ${
       tryToGetWsInstance(props.mid)?.info.url
-    } owing to: ${ev.reason}`
+    } owing to: ${ev}`
   );
 };
 
 const wsOnMsgCallback = (ev: MessageEvent) => {
+  // TODO: disable
   console.log(`${localModuleInfo.name} get msg: \n ${ev.data}`);
 };
 
 const wsOnErrorCallback = (ev: Event) => {
-  console.log(ev);
+  console.error(`${localModuleInfo.name} get error: \n ${ev}`);
 };
 
 // module websocket related
@@ -310,6 +313,7 @@ const confirmCallBack = () => {
           // TODO: server critical change: do ??
 
           // TODO: async reconnect and loading
+          asyncConnect();
         }
       } else {
         wsIns.info.url = makeWsUrl(
@@ -323,24 +327,32 @@ const confirmCallBack = () => {
 
   moduleStore.updateModule(props.mid, localModuleInfo);
   modifyBooleanState(btnModifyState);
-
-  // debug only
-  const ff = wsStore.getModuleWs(props.mid);
-  if (ff !== null) ff.info.mid = "aa";
-  console.log(wsStore.moduleWs.ws); // suppose one has mid "aa" for reactive sake
 };
 
 async function asyncConnect() {
-  // change state
-
-  // then 
+  // TODO: add loading state
+  modifyBooleanState(btnEnableState);
+  btnEnableLoading.value = true;
+  let ws = tryToGetWsInstance(props.mid);
+  try {
+    const wsConnectState = await ws?.connectWs();
+    console.log(wsConnectState);
+    if (wsConnectState === WsInstance.OPEN) {
+      modifyBooleanState(btnEnableState);
+    }
+  } catch (err) {
+    // do something in call back already
+  } finally {
+    btnEnableLoading.value = false;
+  }
 }
 
 const enableCallBack = () => {
-  modifyBooleanState(btnEnableState);
+  modifyBooleanState(btnEnableState); // decided by asyncConnect now
 
   // close or reconnect the websocket async and loading mark on btn
-  if(btnEnableState.value === false) tryToGetWsInstance(props.mid)?.closeWs();
+  // TODO: async close with asyncClose();
+  if (btnEnableState.value === false) tryToGetWsInstance(props.mid)?.closeWs();
   else {
     asyncConnect();
   }
@@ -351,7 +363,9 @@ const enableCheck = () => {
   const serveruuid = moduleStore.getModuleInfo(props.mid).server;
   // if not default value: "None"
   if (serveruuid !== "None")
-    return serverStore.getServerInfo(serveruuid).alive === true;
+    // BUG: 等下記得開起來
+    return true;
+    // return serverStore.getServerInfo(serveruuid).alive === true;
   return false;
 };
 

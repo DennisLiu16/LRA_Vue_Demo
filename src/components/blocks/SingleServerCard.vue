@@ -79,7 +79,6 @@ const tryToGetResponsiveServerInfo = computed(() => {
   // use index instead getInfo
   // will throw error if not found
   const idx = serverStore.getServerIndex(props.uuid);
-  console.log("this should appear if server info being modified");
   return serverStore.serverList.servers[idx];
 });
 

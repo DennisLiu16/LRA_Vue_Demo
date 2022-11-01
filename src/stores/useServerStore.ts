@@ -28,6 +28,7 @@ export const useServerStore = defineStore(
       return selection;
     });
 
+    // TODO: move to ServerBlock.vue
     initCheck();
 
     function initCheck() {
@@ -43,7 +44,7 @@ export const useServerStore = defineStore(
             window.location.hostname === "localhost"
               ? "127.0.0.1"
               : window.location.hostname,
-          port: parseInt(window.location.port),
+          port: 8765, // parseInt(window.location.port),
           alive: false,
         } as IServerInfo;
         serverList.servers.push(localServer);

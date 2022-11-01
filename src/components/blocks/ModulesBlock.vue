@@ -33,19 +33,19 @@ import { AddFilled } from "@vicons/material";
 import SingleModuleCard from "@/components/blocks/SingleModuleCard.vue";
 
 const moduleStore = useModuleStore();
-debugOnly();
 
 function debugOnly() {
   console.log(moduleStore.moduleList.modules);
 }
 
+// only run once
 const addModule = () => {
   // create a module instance
   const module = new Module({
     mid: uuidv4(),
     name: "Default",
-    ip: "192.0.0.0",
-    port: 8787,
+    ip: "192.168.0.188",
+    port: 8765,
     server: "None",
   });
 

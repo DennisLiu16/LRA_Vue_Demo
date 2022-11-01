@@ -6,6 +6,12 @@
 
 // first version
 export class WsInstance {
+
+  static readonly OPEN = "onopen";
+  static readonly CLOSE = "onclose";
+  static readonly MESSAGE = "onmessage";
+  static readonly ERROR = "onerror";
+
   info: wsInfo;
   mode: "direct" | "broadcast" = "broadcast"; // direct 是模組直連; broadcast 是透過網頁轉接
   target: "server" | "module" = "module"; // connection target
@@ -22,59 +28,72 @@ export class WsInstance {
   }
 
   send(data: any) {
-    if (this._ws !== null)
-      this._ws.send(data);
+    if (this._ws !== null) this._ws.send(data);
     else {
-      console.error(`_ws: ${this.info.url} hasn't built yet! Please call reconnecWs() first!`);
+      console.error(
+        `_ws: ${this.info.url} hasn't built yet! Please call reconnecWs() first!`
+      );
     }
   }
 
   // close WsInstance.ws, and assign to null
+  // TODO: also
   closeWs() {
-    if(this._ws !== null){
+    if (this._ws !== null) {
       this._ws.close();
       this._ws = null;
     }
   }
 
   connectWs() {
-    this.reconnectWs();
+    return this.reconnectWs();
   }
 
+  // TODO: 參考這個修改: https://cloud.tencent.com/developer/article/1623173
+  // TODO: 改名
   reconnectWs() {
-    this._ws = new WebSocket(this.info.url);
-    this.updateCallbacks();
+    return new Promise((resolve, reject) => {
+      this._ws = new WebSocket(this.info.url);
+      this.updateCallbacks(resolve, reject);
+    });
   }
 
   getWsReadyState() {
-    if(this._ws !== null) {
+    if (this._ws !== null) {
       return this._ws.readyState;
     } else {
       return null;
     }
   }
 
-  updateCallbacks(){
+  // async or not
+  updateCallbacks(resolve?: any, reject?: any) {
     if (this._ws === null) {
-      console.error(`_ws in WsInstance: ${this.info.mid} is null, call reconnect() first`);
+      console.error(
+        `_ws in WsInstance: ${this.info.mid} is null, call reconnect() first`
+      );
       return;
     }
 
-    if(this.info.opt?.onOpenCallback !== undefined){
-      this._ws.onopen = this.info.opt.onOpenCallback;
-    }
+    this._ws.onopen = () => {
+      resolve?.(WsInstance.OPEN);
+      this.info.opt?.onOpenCallback?.();
+    };
 
-    if(this.info.opt?.onCloseCallback !== undefined){
-      this._ws.onclose = this.info.opt.onCloseCallback;
-    }
+    this._ws.onclose = (ev: CloseEvent) => {
+      resolve?.(WsInstance.CLOSE);
+      this.info.opt?.onCloseCallback?.(ev);
+    };
 
-    if(this.info.opt?.onMsgCallback !== undefined){
-      this._ws.onmessage = this.info.opt.onMsgCallback;
-    }
+    this._ws.onmessage = (ev: MessageEvent) => {
+      resolve?.(WsInstance.MESSAGE);
+      this.info.opt?.onMsgCallback?.(ev);
+    };
 
-    if(this.info.opt?.onErrorCallback !== undefined){
-      this._ws.onerror = this.info.opt.onErrorCallback;
-    }
+    this._ws.onerror = (ev: Event) => {
+      reject(WsInstance.ERROR);
+      this.info.opt?.onErrorCallback?.(ev);
+    };
   }
 }
 
