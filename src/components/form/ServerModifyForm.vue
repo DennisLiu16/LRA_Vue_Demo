@@ -1,6 +1,13 @@
 <template>
   <div>
-    <n-button strong secondary circle type="info" @click="showModal = true">
+    <n-button
+      strong
+      secondary
+      circle
+      type="info"
+      :disabled="props.disabled"
+      @click="showModal = true"
+    >
       <Icon :size="20">
         <AppsList20Filled />
       </Icon>
@@ -90,6 +97,9 @@ const props = defineProps({
   uuid: {
     type: String,
     required: true,
+  },
+  disabled: {
+    type: Boolean,
   },
 });
 const emits = defineEmits(["formModified"]);
@@ -187,7 +197,7 @@ const ValidateCallBack = () => {
 
 const LeaveCallBack = () => {
   showModal.value = false;
-  
+
   // resume info
   const data = serverStore.getServerInfo(props.uuid);
   localServerInfo.value.name = data.name;

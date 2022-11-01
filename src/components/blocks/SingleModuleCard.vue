@@ -370,7 +370,7 @@ const enableCheck = () => {
   if (serveruuid !== "None") {
     // BUG: 等下記得開起來
     return false;
-    return serverStore.getServerInfo(serveruuid).alive === true;
+    // return serverStore.getServerInfo(serveruuid).alive === true;
   }
   return true;
 };
@@ -379,9 +379,9 @@ const addNewServerCallBack = (serverinfo: IServerInfo) => {
   // Add to serverList
   serverStore.serverList.servers.push(serverinfo);
 
-  // TODO: create a new websocket instance here if info valid (ws_tmp)
+  // TODO: create a new websocket instance here if info valid (ws_tmp) => servercard
 
-  // TODO: hit api to check alive, modify data in serverList, not local var
+  // TODO: hit api to check alive, modify data in serverList, not local var => servercard
   // if success -> modify localserver to target server
   // if fail -> remove from list, ansyc function
 };

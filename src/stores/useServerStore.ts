@@ -29,29 +29,29 @@ export const useServerStore = defineStore(
     });
 
     // TODO: move to ServerBlock.vue
-    initCheck();
+    // initCheck();
 
-    function initCheck() {
-      if (
-        serverList.servers.find((el) => el.name == "MainServer") == undefined
-      ) {
-        const uuid = uuidv4();
-        /* TODO: 要將 ip 和 port 改成之後 django 的設置 */
-        const localServer = {
-          uuid: uuid,
-          name: "MainServer",
-          ip:
-            window.location.hostname === "localhost"
-              ? "127.0.0.1"
-              : window.location.hostname,
-          port: 8765, // parseInt(window.location.port),
-          alive: false,
-        } as IServerInfo;
-        serverList.servers.push(localServer);
-      } else {
-        // TODO: Hit API to test django state
-      }
-    }
+    // function initCheck() {
+    //   if (
+    //     serverList.servers.find((el) => el.name == "MainServer") == undefined
+    //   ) {
+    //     const uuid = uuidv4();
+    //     /* TODO: 要將 ip 和 port 改成之後 django 的設置 */
+    //     const localServer = {
+    //       uuid: uuid,
+    //       name: "MainServer",
+    //       ip:
+    //         window.location.hostname === "localhost"
+    //           ? "127.0.0.1"
+    //           : window.location.hostname,
+    //       port: 8765, // parseInt(window.location.port),
+    //       alive: false,
+    //     } as IServerInfo;
+    //     serverList.servers.push(localServer);
+    //   } else {
+    //     // TODO: Hit API to test django state
+    //   }
+    // }
 
     const getServerName = (uuid: string) => {
       const candidate = serverList.servers.find((el) => el.uuid === uuid);
@@ -77,6 +77,10 @@ export const useServerStore = defineStore(
       info.port = serverList.servers[idx].port;
       info.alive = serverList.servers[idx].alive;
       return info;
+    };
+
+    const addServer = (obj: IServerInfo) => {
+      serverList.servers.push(obj);
     };
 
     /* You should check serverWs by yourself! */
@@ -110,6 +114,7 @@ export const useServerStore = defineStore(
       getServerIndex,
       getServerInfo,
       getServerName,
+      addServer,
       removeServer,
       updateServerInfo,
     };

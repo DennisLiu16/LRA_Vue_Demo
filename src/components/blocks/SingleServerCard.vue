@@ -9,7 +9,8 @@
           secondary
           circle
           type="error"
-          @click="serverStore.removeServer(props.uuid)"
+          :disabled="isMainServer"
+          @click="removeServerCard"
         >
           <Icon :size="20"> <DeleteForeverRound /> </Icon
         ></n-button>
@@ -17,6 +18,7 @@
       <div class="btn-region">
         <ServerModifyForm
           :uuid="props.uuid"
+          :disabled="isMainServer"
           @form-modified="modifyServerCallBack"
         />
       </div>
@@ -56,6 +58,7 @@
 import { ref, computed, onMounted } from "vue";
 import { NButton, NCard, NSpace } from "naive-ui";
 import { useServerStore } from "@/stores/useServerStore";
+import { useWebSocketStore } from "@/stores/useWebSocketStore";
 import { Icon } from "@vicons/utils";
 import { DeleteForeverRound } from "@vicons/material";
 import { AppsList20Filled } from "@vicons/fluent";
@@ -71,9 +74,12 @@ const props = defineProps({
   },
 });
 
-let ws: WsInstance;
-
 const serverStore = useServerStore();
+const wsStore = useWebSocketStore();
+
+const isMainServer = computed(() => {
+  return serverStore.getServerInfo(props.uuid).name === "MainServer";
+});
 
 const tryToGetResponsiveServerInfo = computed(() => {
   // use index instead getInfo
@@ -81,6 +87,11 @@ const tryToGetResponsiveServerInfo = computed(() => {
   const idx = serverStore.getServerIndex(props.uuid);
   return serverStore.serverList.servers[idx];
 });
+
+const removeServerCard = () => {
+  serverStore.removeServer(props.uuid);
+  wsStore.removeServerWs(props.uuid);
+}
 
 const modifyServerCallBack = (serverinfo: IServerInfo) => {
   // Add to serverList
@@ -97,7 +108,6 @@ const modifyServerCallBack = (serverinfo: IServerInfo) => {
 onMounted(() => {
   // get ws if serverWs exists, or create a new connection
 });
-
 </script>
 
 <style scoped>

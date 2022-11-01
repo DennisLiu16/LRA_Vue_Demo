@@ -38,7 +38,7 @@ function debugOnly() {
   console.log(moduleStore.moduleList.modules);
 }
 
-// only run once
+// callbacks
 const addModule = () => {
   // create a module instance
   const module = new Module({
