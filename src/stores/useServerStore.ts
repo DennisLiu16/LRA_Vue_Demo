@@ -106,6 +106,12 @@ export const useServerStore = defineStore(
       }
     };
 
+    // 再想想吧
+    const switchServerAlive = (uuid: string) => {
+      const idx = getServerIndex(uuid);
+      serverList.servers[idx].alive = !serverList.servers[idx].alive;
+    };
+
     return {
       serverList,
       serverSelect,
@@ -117,6 +123,9 @@ export const useServerStore = defineStore(
       addServer,
       removeServer,
       updateServerInfo,
+
+      // should be aborted
+      switchServerAlive,
     };
   },
   {

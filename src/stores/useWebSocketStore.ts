@@ -31,8 +31,8 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
       return serverWs.ws[idx];
     } else {
       // TODO: error handle
-      return null;
       console.error(`can't find server ws for mid: ${mid}`);
+      return null;
     }
   };
 
@@ -45,6 +45,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   const removeServerWs = (mid: string) => {
     const idx = getIndex(mid, "server");
     if (idx !== -1) {
+      // TODO: close first
       serverWs.ws.splice(idx, 1);
     }
   };
@@ -70,6 +71,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   const removeModuleWs = (mid: string) => {
     const idx = getIndex(mid, "module");
     if (idx !== -1) {
+      // TODO: close first
       moduleWs.ws.splice(idx, 1);
     }
   };

@@ -333,7 +333,6 @@ const confirmCallBack = () => {
 };
 
 async function asyncConnect() {
-  // TODO: add loading state
   modifyBooleanState(btnEnableState);
   btnEnableLoading.value = true;
   let ws = tryToGetWsInstance(props.mid);

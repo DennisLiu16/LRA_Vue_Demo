@@ -65,7 +65,7 @@ import { AppsList20Filled } from "@vicons/fluent";
 import ServerModifyForm from "@/components/form/ServerModifyForm.vue";
 
 import type { IServerInfo } from "@/interface/server.interface";
-import type { WsInstance } from "@/interface/myWebSocket.interface";
+import { WsInstance } from "@/interface/myWebSocket.interface";
 
 const props = defineProps({
   uuid: {
@@ -76,6 +76,8 @@ const props = defineProps({
 
 const serverStore = useServerStore();
 const wsStore = useWebSocketStore();
+
+const loadingIconShow = ref(false);
 
 const isMainServer = computed(() => {
   return serverStore.getServerInfo(props.uuid).name === "MainServer";
@@ -104,6 +106,31 @@ const modifyServerCallBack = (serverinfo: IServerInfo) => {
   // if success -> modify localserver to target server
   // if fail -> remove from list, ansyc function
 };
+
+// ws related
+async function asyncConnect() {
+  loadingIconShow.value = true;
+  let ws = tryToGetWsInstance(props.uuid);
+  try {
+    const wsConnectState = await ws?.connectWs();
+    if (wsConnectState === WsInstance.OPEN) {
+      serverStore.switchServerAlive(props.uuid);
+      console.log(`server: ${tryToGetResponsiveServerInfo.value.name} succesfully connected`);
+    }
+  } catch (err) {
+    // do something in call back already
+  } finally {
+    loadingIconShow.value = false;
+  }
+}
+
+const tryToGetWsInstance = (uuid: string) => {
+  return wsStore.getServerWs(uuid);
+};
+
+// callbacks
+
+
 
 onMounted(() => {
   // get ws if serverWs exists, or create a new connection
