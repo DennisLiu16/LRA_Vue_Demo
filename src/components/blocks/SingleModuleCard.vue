@@ -95,7 +95,7 @@
           secondary
           round
           type="info"
-          :disabled="enableCheck()"
+          :disabled="disableCheck()"
           :loading="btnEnableLoading"
           @click="enableCallBack"
         >
@@ -250,11 +250,11 @@ const wsOnCloseCallback = (ev: CloseEvent) => {
 
 const wsOnMsgCallback = (ev: MessageEvent) => {
   // TODO: disable
-  console.log(`${localModuleInfo.name} get msg: \n ${ev.data}`);
+  console.log(`${localModuleInfo.name} get msg: `, ev.data);
 };
 
 const wsOnErrorCallback = (ev: Event) => {
-  console.error(`${localModuleInfo.name} get error: \n ${ev}`);
+  console.error(`${localModuleInfo.name} get error: `, ev);
 };
 
 // module websocket related
@@ -266,7 +266,6 @@ const modifyBooleanState = (refbool: Ref<boolean>) => {
 };
 
 // callbacks //
-
 const removeModuleCallback = () => {
   moduleStore.removeModule(props.mid);
   wsStore.removeModuleWs(props.mid);
@@ -340,11 +339,13 @@ async function asyncConnect() {
     const wsConnectState = await ws?.connectWs();
     if (wsConnectState === WsInstance.OPEN) {
       modifyBooleanState(btnEnableState);
+      
     }
   } catch (err) {
     // do something in call back already
   } finally {
     btnEnableLoading.value = false;
+    moduleStore.updateModuleEnableState(props.mid, btnEnableState.value);
   }
 }
 
@@ -362,14 +363,14 @@ const enableCallBack = () => {
 };
 
 // if server is alive -> enable to connect, start 按鈕會不會亮的檢查程式
-const enableCheck = () => {
+// check enable button disable or not
+const disableCheck = () => {
   const serveruuid = moduleStore.getModuleInfo(props.mid).server;
   // if not default value: "None"
 
   if (serveruuid !== "None") {
     // BUG: 等下記得開起來
-    return false;
-    // return serverStore.getServerInfo(serveruuid).alive === true;
+    return serverStore.getServerInfo(serveruuid).alive === false;
   }
   return true;
 };
@@ -447,7 +448,8 @@ onMounted(() => {
   const ws = verifyWsInstance(props.mid);
   if (btnEnableState.value === true && ws?.getWsReadyState() === null) {
     // TODO: WebSocket is null then reconnect async and loading
-    ws?.reconnectWs();
+    asyncConnect();
+    // ws?.reconnectWs();
   }
 });
 

@@ -1,40 +1,69 @@
 import { isPortOutOfRange } from "./netUtil";
 
-// request or update => send type
-const wsLraMsgRequestType = [
+// request or update => send type, from maching server or web side
+const wsLraMsgRequireType = [
   // only type in json
   "regAllRequire",
   "regDrvRequire",
   "regAdxlRequire",
-  "dataNewestRequire",
-  "dataRealTimeRequire",
-  "dataRealTimeStopRequire",
+  "dataRTNewestRequire",
+  "dataRTKeepRequire",
+  "dataRTStopRequire",
   "moduleInfoRequire",
 ] as const;
 
 const wsLraMsgUpdateType = [
   // type and data in json
-  "serverInfoUpdate",
-  "regAllUpdate",
+  "webInfoUpdate",
+  "regAllUpdate", // update register value from web side
   "regDrvUpdate",
   "regAdxlUpdate",
   "drvCmdUpdate",
 ] as const;
 
-const wsLraMsgReciveType = [
-  "recDataRT",
-  "recRegAll",
-  "recRegDrv",
-  "recRegAdxl",
+// 回應 require
+const wsLraMsgResponseType = [
+  "regAllRequireResponse",
+  "regDrvRequireResponse",
+  "regAdxlRequireResponse",
+  "dataRTNewestRequireResponse",
+  "dataRTKeepRequireResponse",
+  "dataRTStopRequireResponse",
+  "moduleInfoRequireResponse",
 ]
 
-type WsLraMsgRequestType = typeof wsLraMsgRequestType[number];
+// 回應 update 的訊息
+const wsLraMsgReceiveType = [
+  // for module only
+  // "dataRTReceive",
+  "webInfoUpdateRecv",
+  "regAllUpdateRecv",
+  "regDrvUpdateRecv",
+  "regAdxlUpdateRecv",
+  "drvCmdUpdateRecv",
+
+  // for machining server only, only websocket direct mode will use this part 
+]
+
+const wsLraServerMsgRequireType = [
+  "serverInfoRequire",
+  "drvCmdKeepRequire",
+  "drvCmdStopRequire",
+]
+
+const wsLraServerMsgResponseType = [
+  "serverInfoRequireResponse",
+  "drvCmdKeepRequireResponse",
+  "drvCmdStopRequireResponse",
+]
+
+type wsLraMsgRequireType = typeof wsLraMsgRequireType[number];
 type WsLraMsgUpdateType = typeof wsLraMsgUpdateType[number];
 
-export type wsLraMsgReciveType = typeof wsLraMsgReciveType[number];
+export type wsLraMsgReceiveType = typeof wsLraMsgReceiveType[number];
 
 export type WSLraMsgSendType =
-  | typeof wsLraMsgRequestType[number]
+  | typeof wsLraMsgRequireType[number]
   | typeof wsLraMsgUpdateType[number];
 
 export function makeWsUrl(
@@ -67,8 +96,8 @@ export function makeWsRequest(
 
 // https://stackoverflow.com/questions/57065617/how-to-check-if-string-in-type/57065680#57065680
 // 判斷 father type 的變數是否屬於 subtype
-function isRequestType(type: string): type is WsLraMsgRequestType {
-  return (wsLraMsgRequestType as readonly string[]).includes(type);
+function isRequestType(type: string): type is wsLraMsgRequireType {
+  return (wsLraMsgRequireType as readonly string[]).includes(type);
 }
 
 function isUpdateType(type: string): type is WsLraMsgUpdateType {

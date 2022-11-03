@@ -19,9 +19,8 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
 
   const getIndex = (mid: string, target: "server" | "module") => {
     if (target === "server")
-      return serverWs.ws.findIndex(
-        (el) => el.info.mid === mid
-      ); // 紀錄: 如果用 const findMid 會有問題 => _ws 是 private，看不到
+      return serverWs.ws.findIndex((el) => el.info.mid === mid);
+    // 紀錄: 如果用 const findMid 會有問題 => _ws 是 private，看不到
     else return moduleWs.ws.findIndex((el) => el.info.mid === mid);
   };
 
@@ -31,7 +30,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
       return serverWs.ws[idx];
     } else {
       // TODO: error handle
-      console.error(`can't find server ws for mid: ${mid}`);
+      console.warn(`can't find server ws for mid: ${mid}`);
       return null;
     }
   };
@@ -45,7 +44,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   const removeServerWs = (mid: string) => {
     const idx = getIndex(mid, "server");
     if (idx !== -1) {
-      // TODO: close first
+      serverWs.ws[idx].closeWs();
       serverWs.ws.splice(idx, 1);
     }
   };
@@ -56,8 +55,8 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
       return moduleWs.ws[idx];
     } else {
       // TODO: error handle
+      console.warn(`can't find server ws for mid: ${mid}`);
       return null;
-      console.error(`can't find server ws for mid: ${mid}`);
     }
   };
 
@@ -71,7 +70,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   const removeModuleWs = (mid: string) => {
     const idx = getIndex(mid, "module");
     if (idx !== -1) {
-      // TODO: close first
+      moduleWs.ws[idx].closeWs();
       moduleWs.ws.splice(idx, 1);
     }
   };

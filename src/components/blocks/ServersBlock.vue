@@ -1,5 +1,6 @@
 <template>
-  <vue-horizontal responsive scroll>
+  <!-- TODO: dynamic width -->
+  <vue-horizontal responsive scroll style="width: 600px">
     <section
       v-for="server in serverStore.serverList.servers"
       :key="server.uuid"
