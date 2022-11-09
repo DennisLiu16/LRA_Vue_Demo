@@ -91,7 +91,7 @@ import {
   type wsOpt,
   type wsInfo,
 } from "@/interface/myWebSocket.interface";
-import { makeWsUrl } from "@/composables/wsUtil";
+import { makeWsUrl, type WsLraServerMsgRequireType, type WsLraServerMsgResponseType } from "@/composables/wsUtil";
 
 // icon
 import { Icon } from "@vicons/utils";
@@ -178,6 +178,14 @@ const wsOnOpenCallback = () => {
   serverStore.switchServerAlive(props.uuid, true);
   loadingState.value = "connected";
   serverStore.updateServerLoadingState(props.uuid, loadingState.value);
+
+  // require server info
+  const msg = {
+    type: "serverInfoRequire",
+    uuid: props.uuid,
+  }
+
+  tryToGetWsInstance(props.uuid)?.send(msg)
 
   // TODO: send server's info to module, module will create a websocket client to the server
   // if(ws.mode === "direct") ...

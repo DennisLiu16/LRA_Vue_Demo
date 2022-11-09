@@ -27,8 +27,10 @@ export class WsInstance {
   }
 
   send(data: any) {
-    if (this._ws !== null) this._ws.send(data);
-    else {
+    if (this._ws !== null) {
+      data = JSON.stringify(data);
+      this._ws.send(data); // non-block
+    } else {
       console.error(
         `_ws: ${this.info.url} hasn't built yet! Please call reconnecWs() first!`
       );
@@ -67,10 +69,11 @@ export class WsInstance {
   }
 
   updateUrl(newUrl: string) {
-    if(this._ws === null)
-      this.info.url = newUrl
+    if (this._ws === null) this.info.url = newUrl;
     else
-      console.error("You should not update WsInstance url when _ws is not null")
+      console.error(
+        "You should not update WsInstance url when _ws is not null"
+      );
   }
 
   updateCallbacks(resolve?: any, reject?: any) {

@@ -36,7 +36,8 @@ function confirmMainServerExists() {
       ip:
         window.location.hostname === "localhost"
           ? "127.0.0.1"
-          : window.location.hostname,
+          // : window.location.hostname,
+          : "192.168.0.156",
       port: 8765, // parseInt(window.location.port),
       alive: false,
     } as IServerInfo;

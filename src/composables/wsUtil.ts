@@ -1,5 +1,7 @@
 import { isPortOutOfRange } from "./netUtil";
 
+// FIXME: 重寫!!
+
 // request or update => send type, from maching server or web side
 const wsLraMsgRequireType = [
   // only type in json
@@ -57,10 +59,13 @@ const wsLraServerMsgResponseType = [
   "drvCmdStopRequireResponse",
 ]
 
-type wsLraMsgRequireType = typeof wsLraMsgRequireType[number];
+type WsLraMsgRequireType = typeof wsLraMsgRequireType[number];
 type WsLraMsgUpdateType = typeof wsLraMsgUpdateType[number];
 
-export type wsLraMsgReceiveType = typeof wsLraMsgReceiveType[number];
+export type WsLraMsgReceiveType = typeof wsLraMsgReceiveType[number];
+
+export type WsLraServerMsgRequireType = typeof wsLraServerMsgRequireType[number];
+export type WsLraServerMsgResponseType = typeof wsLraServerMsgResponseType[number];
 
 export type WSLraMsgSendType =
   | typeof wsLraMsgRequireType[number]
@@ -96,7 +101,7 @@ export function makeWsRequest(
 
 // https://stackoverflow.com/questions/57065617/how-to-check-if-string-in-type/57065680#57065680
 // 判斷 father type 的變數是否屬於 subtype
-function isRequestType(type: string): type is wsLraMsgRequireType {
+function isRequestType(type: string): type is WsLraMsgRequireType {
   return (wsLraMsgRequireType as readonly string[]).includes(type);
 }
 
