@@ -3,5 +3,6 @@ export interface IServerInfo {
   name: string;
   ip: string;
   port: number;
-  alive: boolean;
+  alive: boolean; // FIXME: should be removed
+  loadingState: "disconnect" | "connected" | "loading"
 }

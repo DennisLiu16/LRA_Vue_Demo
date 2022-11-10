@@ -28,31 +28,6 @@ export const useServerStore = defineStore(
       return selection;
     });
 
-    // TODO: move to ServerBlock.vue
-    // initCheck();
-
-    // function initCheck() {
-    //   if (
-    //     serverList.servers.find((el) => el.name == "MainServer") == undefined
-    //   ) {
-    //     const uuid = uuidv4();
-    //     /* TODO: 要將 ip 和 port 改成之後 django 的設置 */
-    //     const localServer = {
-    //       uuid: uuid,
-    //       name: "MainServer",
-    //       ip:
-    //         window.location.hostname === "localhost"
-    //           ? "127.0.0.1"
-    //           : window.location.hostname,
-    //       port: 8765, // parseInt(window.location.port),
-    //       alive: false,
-    //     } as IServerInfo;
-    //     serverList.servers.push(localServer);
-    //   } else {
-    //     // TODO: Hit API to test django state
-    //   }
-    // }
-
     const getServerName = (uuid: string) => {
       const candidate = serverList.servers.find((el) => el.uuid === uuid);
       if (candidate != undefined) return candidate.name;
@@ -76,6 +51,7 @@ export const useServerStore = defineStore(
       info.ip = serverList.servers[idx].ip;
       info.port = serverList.servers[idx].port;
       info.alive = serverList.servers[idx].alive;
+      info.loadingState = serverList.servers[idx].loadingState;
       return info;
     };
 
@@ -92,24 +68,36 @@ export const useServerStore = defineStore(
 
     const updateServerInfo = (uuid: string, info: IServerInfo) => {
       const idx = getServerIndex(uuid);
-      if (info.name !== serverList.servers[idx].name)
-        serverList.servers[idx].name = info.name;
 
-      if (info.ip !== serverList.servers[idx].ip) {
-        serverList.servers[idx].ip = info.ip;
-        serverList.servers[idx].alive = false;
+      serverList.servers[idx].name = info.name;
+
+      // XXX
+      if (serverList.servers[idx].ip !== info.ip || serverList.servers[idx].port !== info.port) {
+        serverList.servers[idx].alive = info.alive;
+        serverList.servers[idx].loadingState = info.loadingState;
       }
 
-      if (info.port !== serverList.servers[idx].port) {
-        serverList.servers[idx].port = info.port;
-        serverList.servers[idx].alive = false;
-      }
+      serverList.servers[idx].ip = info.ip;
+      // serverList.servers[idx].alive = false;
+
+      serverList.servers[idx].port = info.port;
+      // serverList.servers[idx].alive = false;
+    };
+
+    const updateServerLoadingState = (
+      uuid: string,
+      state: "disconnect" | "connected" | "loading"
+    ) => {
+      const idx = getServerIndex(uuid);
+      serverList.servers[idx].loadingState = state;
     };
 
     // 再想想吧
-    const switchServerAlive = (uuid: string) => {
+    const switchServerAlive = (uuid: string, state?: boolean) => {
       const idx = getServerIndex(uuid);
-      serverList.servers[idx].alive = !serverList.servers[idx].alive;
+      const _state =
+        state !== undefined ? state : !serverList.servers[idx].alive;
+      serverList.servers[idx].alive = _state;
     };
 
     return {
@@ -126,6 +114,7 @@ export const useServerStore = defineStore(
 
       // should be aborted
       switchServerAlive,
+      updateServerLoadingState,
     };
   },
   {
