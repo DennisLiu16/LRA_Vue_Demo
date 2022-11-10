@@ -1,20 +1,20 @@
 import { isPortOutOfRange } from "./netUtil";
 
 // request or update => send type
-const wsLraMsgRequestType = [
+const wsLraMsgRequireType = [
   // only type in json
   "regAllRequire",
   "regDrvRequire",
   "regAdxlRequire",
-  "dataNewestRequire",
-  "dataRealTimeRequire",
-  "dataRealTimeStopRequire",
+  "dataRTNewestRequire",
+  "dataRTKeepRequire",
+  "dataRTStopRequire",
   "moduleInfoRequire",
 ] as const;
 
 const wsLraMsgUpdateType = [
   // type and data in json
-  "serverInfoUpdate",
+  "webInfoUpdate",
   "regAllUpdate",
   "regDrvUpdate",
   "regAdxlUpdate",
@@ -22,19 +22,42 @@ const wsLraMsgUpdateType = [
 ] as const;
 
 const wsLraMsgReciveType = [
-  "recDataRT",
-  "recRegAll",
-  "recRegDrv",
-  "recRegAdxl",
-]
+  "webInfoUpdateRecv",
+  "regAllUpdateRecv",
+  "regDrvUpdateRecv",
+  "regAdxlUpdateRecv",
+  "drvCmdUpdateRecv",
+] as const;
 
-type WsLraMsgRequestType = typeof wsLraMsgRequestType[number];
+const wsLraMsgResponseType = [
+  "regAllRequireResponse",
+  "regDrvRequireResponse",
+  "regAdxlRequireResponse",
+  "dataRTNewestRequireResponse",
+  "dataRTKeepRequireResponse",
+  "dataRTStopRequireResponse",
+  "moduleInfoRequireResponse",
+] as const;
+
+const wsLraMachiningServerMsgRequestType = [
+  "serverInfoRequire",
+  "drvCmdKeepRequire",
+  "drvCmdStopRequire",
+] as const;
+
+const wsLraMachiningServerMsgResponseType = [
+  "serverInfoRequireResponse",
+  "drvCmdKeepRequireResponse",
+  "drvCmdStopRequireResponse",
+] as const;
+
+type WsLraMsgRequestType = typeof wsLraMsgRequireType[number];
 type WsLraMsgUpdateType = typeof wsLraMsgUpdateType[number];
 
 export type wsLraMsgReciveType = typeof wsLraMsgReciveType[number];
 
 export type WSLraMsgSendType =
-  | typeof wsLraMsgRequestType[number]
+  | typeof wsLraMsgRequireType[number]
   | typeof wsLraMsgUpdateType[number];
 
 export function makeWsUrl(
@@ -68,7 +91,7 @@ export function makeWsRequest(
 // https://stackoverflow.com/questions/57065617/how-to-check-if-string-in-type/57065680#57065680
 // 判斷 father type 的變數是否屬於 subtype
 function isRequestType(type: string): type is WsLraMsgRequestType {
-  return (wsLraMsgRequestType as readonly string[]).includes(type);
+  return (wsLraMsgRequireType as readonly string[]).includes(type);
 }
 
 function isUpdateType(type: string): type is WsLraMsgUpdateType {
