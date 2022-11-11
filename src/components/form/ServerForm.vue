@@ -151,6 +151,8 @@ const disableConfirmButton = computed(() => {
     localServerInfo.value.ip === null ||
     localServerInfo.value.port === null;
 
+  const isUniqueMainServer: boolean = (serverStore.getServerInfo(localServerInfo.value.uuid).name === "MainServer");
+
   const nameNotValid: boolean = serverStore.serverBanNameList.includes(
     localServerInfo.value.name
   );
@@ -165,7 +167,7 @@ const disableConfirmButton = computed(() => {
     return !regExpOfIPv4.test(localServerInfo.value.ip);
   };
 
-  return isNull || nameNotValid || portOutOfRange() || ipIsNotIPv4();
+  return isNull || (nameNotValid && !isUniqueMainServer) || portOutOfRange() || ipIsNotIPv4();
 });
 
 const rules: FormRules = {
@@ -173,8 +175,11 @@ const rules: FormRules = {
     {
       required: true,
       validator(rule: FormItemRule, value: string) {
+        const isUniqueMainServer: boolean = (serverStore.getServerInfo(localServerInfo.value.uuid).name === "MainServer");
+        
         if (!value) return new Error("Name is required");
         else if (serverStore.serverBanNameList.includes(value)) {
+          if (isUniqueMainServer) return;
           return new Error("Name can't be ' " + value + " '");
         }
       },

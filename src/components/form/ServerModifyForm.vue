@@ -127,12 +127,14 @@ const disableConfirmButton = computed(() => {
     return port <= 0 || port > 65535;
   };
 
+  const isUniqueMainServer: boolean = (serverStore.getServerInfo(props.uuid).name === "MainServer");
+
   const ipIsNotIPv4 = () => {
     const regExpOfIPv4 = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
     return !regExpOfIPv4.test(localServerInfo.value.ip);
   };
 
-  return isNull || nameNotValid || portOutOfRange() || ipIsNotIPv4();
+  return isNull || (nameNotValid && !isUniqueMainServer) || portOutOfRange() || ipIsNotIPv4();
 });
 
 const rules: FormRules = {
@@ -140,8 +142,10 @@ const rules: FormRules = {
     {
       required: true,
       validator(rule: FormItemRule, value: string) {
+        // XXX: 應該要限制 mainServer不能改名
+        const isUniqueMainServer: boolean = (serverStore.getServerInfo(props.uuid).name === "MainServer");
         if (!value) return new Error("Name is required");
-        else if (serverStore.serverBanNameList.includes(value)) {
+        else if (serverStore.serverBanNameList.includes(value) && !isUniqueMainServer) {
           return new Error("Name can't be ' " + value + " '");
         }
       },

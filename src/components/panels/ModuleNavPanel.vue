@@ -3,9 +3,9 @@
 <template>
   <n-card>
     <nav>
-      <RouterLink to="/base/registers">Register</RouterLink>
+      <router-link :to="{name: 'registers', params: {uuid: props.uuid}}" >Register</router-link>
       <n-divider/>
-      <RouterLink to="/base/real-time-plot">RT Plot</RouterLink>
+      <RouterLink :to="{name: 'real-time-plot', params: {uuid: props.uuid}}">RT Plot</RouterLink>
     </nav>
   </n-card>
 </template>
@@ -19,6 +19,10 @@ import VueHorizontal from "vue-horizontal";
 
 import { RouterLink, RouterView } from "vue-router";
 
+const isDisabled = computed(() => {
+  return false;
+});
+
 // store
 // import { useServerStore } from "@/stores/useServerStore";
 
@@ -26,9 +30,15 @@ import { RouterLink, RouterView } from "vue-router";
 // import { DeleteForeverRound } from "@vicons/material";
 
 // props and emit
-// const props = defineProps({});
+const props = defineProps({
+  uuid: {
+    // module id
+    type: String,
+    required: true,
+  },
+});
 
-// const emits = defineEmits({});
+// const emits = defineEmits([]);
 </script>
 
 <style scoped></style>

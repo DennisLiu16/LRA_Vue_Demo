@@ -19,13 +19,13 @@ onMounted(() => {
     />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld msg="LRA Project" />
 
       <!-- TODO: enable only if module is connected -->
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/base/registers">Register</RouterLink>
-        <RouterLink to="/base/real-time-plot">RT Plot</RouterLink>
+        <!-- <RouterLink to="/base/registers">Register</RouterLink>
+        <RouterLink to="/base/real-time-plot">RT Plot</RouterLink> -->
       </nav>
     </div>
   </header>

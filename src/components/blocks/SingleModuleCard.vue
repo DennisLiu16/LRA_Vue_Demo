@@ -151,7 +151,7 @@
         <!-- TODO: add button loading state -->
       </p>
     </n-card>
-    <ModuleNavPanel class="card-sub" />
+    <ModuleNavPanel class="card-sub" :uuid="props.mid"/>
   </div>
 </template>
 
@@ -246,11 +246,15 @@ const wsOnCloseCallback = (ev: CloseEvent) => {
     } owing to: `,
     ev
   );
+  // modify btn state
+  btnEnableState.value = false;
+  moduleStore.updateModuleEnableState(props.mid, btnEnableState.value);
 };
 
 const wsOnMsgCallback = (ev: MessageEvent) => {
   // TODO: disable
-  console.log(`${localModuleInfo.name} get msg: `, ev.data);
+  const data = JSON.parse(ev.data);
+  console.log(data);
 };
 
 const wsOnErrorCallback = (ev: Event) => {

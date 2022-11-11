@@ -17,14 +17,14 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   const serverdata = reactive<{ data: ILraServerData[] }>({ data: [] });
   const moduledata = reactive<{ data: ILraModuleData[] }>({ data: [] });
 
-  const getIndex = (mid: string, target: "server" | "module") => {
+  const getIndex = (mid: string | string[], target: "server" | "module") => {
     if (target === "server")
       return serverWs.ws.findIndex((el) => el.info.mid === mid);
     // 紀錄: 如果用 const findMid 會有問題 => _ws 是 private，看不到
     else return moduleWs.ws.findIndex((el) => el.info.mid === mid);
   };
 
-  const getServerWs = (mid: string) => {
+  const getServerWs = (mid: string | string[]) => {
     const idx = getIndex(mid, "server");
     if (idx !== -1) {
       return serverWs.ws[idx];
@@ -41,7 +41,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   };
 
   /** should be called @ removeServer in SingleServerCard */
-  const removeServerWs = (mid: string) => {
+  const removeServerWs = (mid: string | string[]) => {
     const idx = getIndex(mid, "server");
     if (idx !== -1) {
       serverWs.ws[idx].closeWs();
@@ -49,7 +49,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
     }
   };
 
-  const getModuleWs = (mid: string) => {
+  const getModuleWs = (mid: string | string[]) => {
     const idx = getIndex(mid, "module");
     if (idx !== -1) {
       return moduleWs.ws[idx];
@@ -67,7 +67,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
 
   // TODO:
   /** should be called @ removeModule in SingleModuleCard or ?? */
-  const removeModuleWs = (mid: string) => {
+  const removeModuleWs = (mid: string| string[]) => {
     const idx = getIndex(mid, "module");
     if (idx !== -1) {
       moduleWs.ws[idx].closeWs();

@@ -24,12 +24,12 @@ const router = createRouter({
       redirect: "/base/real-time-plot",
       children: [
         {
-          path: "registers",
+          path: "registers/:uuid",
           name: "registers",
           component: () => import("../views/LRARegisterView.vue"),
         },
         {
-          path: "real-time-plot",
+          path: "real-time-plot/:uuid",
           name: "real-time-plot",
           component: () => import("../views/LRARealTimePlotView.vue"),
         },

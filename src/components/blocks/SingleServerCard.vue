@@ -18,7 +18,6 @@
       <div class="btn-region">
         <ServerModifyForm
           :uuid="props.uuid"
-          :disabled="isMainServer"
           @form-modified="modifyServerCallBack"
         />
       </div>
@@ -91,7 +90,7 @@ import {
   type wsOpt,
   type wsInfo,
 } from "@/interface/myWebSocket.interface";
-import { makeWsUrl, type WsLraServerMsgRequireType, type WsLraServerMsgResponseType } from "@/composables/wsUtil";
+import { makeWsRequest, makeWsUrl, type WsLraServerMsgRequireType, type WsLraServerMsgResponseType } from "@/composables/wsUtil";
 
 // icon
 import { Icon } from "@vicons/utils";
@@ -207,11 +206,34 @@ const wsOnCloseCallback = (ev: CloseEvent) => {
 
 const wsOnMsgCallback = (ev: MessageEvent) => {
   // TODO: disable
-  console.log(`${getServerInfo.value.name} ws get msg: \n`, ev.data);
+  // console.log(`${getServerInfo.value.name} ws get msg: \n`, ev.data);
+  wsMsgParser(ev.data);
 };
 
 const wsOnErrorCallback = (ev: Event) => {
   console.error(`${getServerInfo.value.name} ws get error: \n`, ev);
+};
+
+/**wsMsgParser */
+const wsMsgParser = (raw_data: any) => {
+  // parse
+  const data = JSON.parse(raw_data);
+  if (data?.type == "serverInfoRequireResponse") {
+    console.log("Server info transfer completed", data);
+
+    /** send drvCmdKeepRequire */
+    let msg = makeWsRequest("drvCmdKeepRequire");
+    Object.assign(msg,{uuid: props.uuid});
+    
+    tryToGetWsInstance(props.uuid)?.send(msg);
+
+    return;
+  } else if (data?.type == "drvCmdKeepRequireResponse") {
+    console.log("new data"); // XXX:log usage
+  } else if(data?.type == "drvCmdStopRequireResponse") {
+    console.log("server stop update cmd");
+    
+  }
 };
 
 async function asyncConnect() {
