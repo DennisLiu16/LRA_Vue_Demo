@@ -1,14 +1,43 @@
 <template>
-  <VueApexCharts :options="options" :series="series"></VueApexCharts>
 </template>
 
 <script setup lang="ts">
 // lib
-import { ref, reactive, computed, type Ref } from "vue";
+import { ref, reactive, computed, type Ref, onBeforeMount, onBeforeUnmount, onMounted, toRaw } from "vue";
 import { NButton, NInput } from "naive-ui";
 import { Icon } from "@vicons/utils";
 import VueHorizontal from "vue-horizontal";
 import VueApexCharts from "vue3-apexcharts";
+
+import { useRoute } from "vue-router";
+import { useWebSocketStore } from "@/stores/useWebSocketStore";
+
+import { lightningChart } from '@arction/lcjs';
+
+const route = useRoute();
+const wsStore = useWebSocketStore();
+const myuuid = route.params.uuid;
+
+// create chart
+const chart = lightningChart().ChartXY();
+chart.setTitle('LRA Real Time Data - Acc X')
+
+const acc_x = chart.addLineSeries();
+acc_x.setStrokeStyle((style) => style.setThickness(5));
+
+const append_new_data = () => {
+  const idx = wsStore.getLraDataIndex(myuuid.toString(), "module");
+  if (idx != -1) {
+    // get data
+    // console.log(toRaw(wsStore.moduledata.data[idx].realtime.acc));
+    acc_x.add(wsStore.moduledata.data[idx].realtime.acc.x);
+    // const len = wsStore.moduledata.data[idx].realtime.acc.x.length;
+    // const x_max = wsStore.moduledata.data[idx].realtime.acc.x[len-1].x;
+  }
+  
+};
+
+setInterval(append_new_data, 10);
 
 // store
 // import { useServerStore } from "@/stores/useServerStore";
@@ -21,50 +50,18 @@ import VueApexCharts from "vue3-apexcharts";
 
 // const emits = defineEmits({});
 
-const thedata = reactive([1, 2, 3, 4]);
+onBeforeMount(() => {
+});
 
-const series = [
-  {
-    name: "test",
-    data: thedata,
-  },
-];
+onMounted(() => {
+  
+}),
 
-const options = {
-  chart: {
-    id: "vuechart-example",
-    height: 350,
-    width: 500,
-    type: "line",
-    animations: {
-      enabled: false,
-      easing: "linear",
-      dynamicAnimation: {
-        speed: 1000,
-      },
-    },
-    stroke: {
-      curve: "smooth",
-    },
-  },
-  xaxis: {
-    datetime: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
-  },
-  dataLabels: {
-    enabled: false,
-  },
-};
+onBeforeUnmount(() => {
+  chart.dispose();
+});
 
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
-}
 
-setInterval(() => {
-  thedata.push(getRandomInt(100));
-  if (thedata.length > 30) {
-    thedata.shift();
-  }
-}, 50);
 </script>
 
 <style scoped></style>

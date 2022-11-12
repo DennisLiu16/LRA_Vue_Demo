@@ -1,7 +1,7 @@
 // for data store
 export interface ILraModuleData {
-  info: ITargetInfo;
-  realtime: IRealtimeData[];
+  uuid:string
+  realtime: IRealtimeData;
   reg: IReg[];
 }
 
@@ -15,11 +15,31 @@ interface ITargetInfo {
   uuid: string,
 }
 
+interface IDrvInfo {
+  freq: IPoint,
+  rtp: IPoint
+}
+
+interface IDrv {
+  x:IDrvInfo,
+  y:IDrvInfo,
+  z:IDrvInfo
+}
+
+interface IAcc {
+  x:IPoint[],
+  y:IPoint[],
+  z:IPoint[]
+}
+
+interface IPoint {
+  x:number,
+  y:number
+}
+
 interface IRealtimeData {
-  time: number | Date;
-  acc: IThreeAxis;
-  freq: IThreeAxis;
-  cmd: IThreeAxis;
+  acc:IAcc,
+  drv:IDrv
 }
 
 interface IReg {

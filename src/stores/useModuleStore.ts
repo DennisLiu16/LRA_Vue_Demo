@@ -64,6 +64,13 @@ export const useModuleStore = defineStore(
       }
     };
 
+    const getModuleLinksTo = (server: string) => { // server is server uuid
+      const filtered = moduleList.modules.filter((module_) => {
+        return module_.server === server && module_.enableState === true;
+      })
+      return filtered;
+    }
+
     return {
       moduleList,
       isModuleExist,
@@ -73,6 +80,7 @@ export const useModuleStore = defineStore(
       getModuleInfo,
       getModuleEnableState,
       updateModuleEnableState,
+      getModuleLinksTo,
     };
   },
   {

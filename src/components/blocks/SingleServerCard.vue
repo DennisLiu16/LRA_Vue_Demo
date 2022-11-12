@@ -81,6 +81,7 @@ import { ref, computed, onMounted } from "vue";
 import { NButton, NCard, NSpace, NSpin } from "naive-ui";
 import { useServerStore } from "@/stores/useServerStore";
 import { useWebSocketStore } from "@/stores/useWebSocketStore";
+import { useModuleStore } from "@/stores/useModuleStore";
 
 import ServerModifyForm from "@/components/form/ServerModifyForm.vue";
 
@@ -106,6 +107,7 @@ const props = defineProps({
 
 const serverStore = useServerStore();
 const wsStore = useWebSocketStore();
+const moduleStore = useModuleStore();
 
 const isMainServer = computed(() => {
   return serverStore.getServerInfo(props.uuid).name === "MainServer";
@@ -225,11 +227,20 @@ const wsMsgParser = (raw_data: any) => {
     let msg = makeWsRequest("drvCmdKeepRequire");
     Object.assign(msg,{uuid: props.uuid});
     
-    tryToGetWsInstance(props.uuid)?.send(msg);
+    tryToGetWsInstance(props.uuid)?.send(msg); // async?
 
     return;
   } else if (data?.type == "drvCmdKeepRequireResponse") {
-    console.log("new data"); // XXX:log usage
+    // broadcast to modules
+    let rtp_msg = makeWsRequest("drvCmdUpdate", {x: data.data.x, y: data.data.y, z:data.data.z});
+    Object.assign(rtp_msg, {uuid: props.uuid});
+    // find module that links to the server
+    const modules = moduleStore.getModuleLinksTo(props.uuid);
+    modules.forEach((ele) => {
+      wsStore.getModuleWs(ele.mid)?.send(rtp_msg);
+    });
+    
+
   } else if(data?.type == "drvCmdStopRequireResponse") {
     console.log("server stop update cmd");
     

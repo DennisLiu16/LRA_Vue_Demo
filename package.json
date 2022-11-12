@@ -9,6 +9,7 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@arction/lcjs": "^3.4.0",
     "@kouts/vue-modal": "^2.1.10",
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.2",

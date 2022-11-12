@@ -254,8 +254,25 @@ const wsOnCloseCallback = (ev: CloseEvent) => {
 const wsOnMsgCallback = (ev: MessageEvent) => {
   // TODO: disable
   const data = JSON.parse(ev.data);
-  console.log(data);
+  /* TODO: we need a parser here */
+  module_parser(data);
+
+  /** if Calibration -> update to  store*/
+  // console.log(data);
 };
+
+const module_parser = (data: any) => {
+  if (data.type === "dataRTKeepRequireResponse") { // get new rt data, update to store
+    wsStore.updateModuleNewRtData(props.mid, data.data);
+
+  } else if(data.type === "drvCmdUpdateRecv") {
+    // do nothing
+  }
+  
+  else {
+    console.log(data);
+  }
+}
 
 const wsOnErrorCallback = (ev: Event) => {
   console.error(`${localModuleInfo.name} get error: `, ev);

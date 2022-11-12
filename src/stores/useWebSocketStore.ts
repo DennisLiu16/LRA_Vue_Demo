@@ -17,6 +17,99 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
   const serverdata = reactive<{ data: ILraServerData[] }>({ data: [] });
   const moduledata = reactive<{ data: ILraModuleData[] }>({ data: [] });
 
+  const updateModuleNewRtData = (uuid: string, data: any) => {
+    // get data or create new
+    // data.acc[0] -> t,x,y,z
+    // data.drv.x.rtp,
+
+    let realtime: any;
+    let acc_obj: object = {};
+    let drv: any;
+
+    if (data.acc == null) {
+    } else {
+      let acc_x_arr: any[] = [];
+      let acc_y_arr: any[] = [];
+      let acc_z_arr: any[] = [];
+      data.acc.forEach((element: any) => {
+        // create x, y, z
+        acc_x_arr.push({
+          x: element.t/1e9,
+          y: element.x,
+        });
+
+        acc_y_arr.push({
+          x: element.t/1e9,
+          y: element.y,
+        });
+
+        acc_z_arr.push({
+          x: element.t/1e9,
+          y: element.z,
+        });
+      });
+      Object.assign(acc_obj, { x: acc_x_arr, y: acc_y_arr, z: acc_x_arr });
+    }
+
+    drv = {
+      x: {
+        freq: {
+          x: data.drv.t,
+          y: data.drv.x.freq,
+        },
+        rtp: {
+          x: data.drv.t,
+          y: data.drv.x.rtp,
+        },
+      },
+      y: {
+        freq: {
+          x: data.drv.t,
+          y: data.drv.y.freq,
+        },
+        rtp: {
+          x: data.drv.t,
+          y: data.drv.y.rtp,
+        },
+      },
+      z: {
+        freq: {
+          x: data.drv.t,
+          y: data.drv.z.freq,
+        },
+        rtp: {
+          x: data.drv.t,
+          y: data.drv.z.rtp,
+        },
+      },
+    };
+
+    realtime = {
+      acc: acc_obj,
+      drv: drv,
+    };
+
+    const index = getLraDataIndex(uuid, "module");
+    if (index == -1) {
+      // create a new data
+      let new_data: ILraModuleData = {
+        uuid: uuid,
+        realtime: realtime,
+        reg: [],
+      };
+      moduledata.data.push(new_data);
+      return getLraDataIndex(uuid, "module");
+    } else {
+      moduledata.data[index].realtime = realtime;
+    }
+  };
+
+  const getLraDataIndex = (uuid: string, target: "server" | "module") => {
+    if (target === "server")
+      return serverdata.data.findIndex((el) => el.info.uuid === uuid);
+    else return moduledata.data.findIndex((el) => el.uuid === uuid);
+  };
+
   const getIndex = (mid: string | string[], target: "server" | "module") => {
     if (target === "server")
       return serverWs.ws.findIndex((el) => el.info.mid === mid);
@@ -67,7 +160,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
 
   // TODO:
   /** should be called @ removeModule in SingleModuleCard or ?? */
-  const removeModuleWs = (mid: string| string[]) => {
+  const removeModuleWs = (mid: string | string[]) => {
     const idx = getIndex(mid, "module");
     if (idx !== -1) {
       moduleWs.ws[idx].closeWs();
@@ -86,5 +179,7 @@ export const useWebSocketStore = defineStore("useWebSocketStore", () => {
     getModuleWs,
     addModuleWs,
     removeModuleWs,
+    updateModuleNewRtData,
+    getLraDataIndex,
   };
 });
